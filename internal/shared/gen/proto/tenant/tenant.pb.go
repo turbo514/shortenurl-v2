@@ -301,13 +301,13 @@ const file_tenant_tenant_proto_rawDesc = "" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\"%\n" +
 	"\rLoginResponse\x12\x14\n" +
-	"\x05token\x18\x01 \x01(\tR\x05token2\xa1\x01\n" +
+	"\x05token\x18\x01 \x01(\tR\x05token2\xdb\x01\n" +
 	"\rTenantService\x12M\n" +
 	"\fCreateTenant\x12\x1d.tenantpb.CreateTenantRequest\x1a\x1e.tenantpb.CreateTenantResponse\x12A\n" +
 	"\n" +
-	"CreateUser\x12\x1b.tenantpb.CreateUserRequest\x1a\x16.google.protobuf.Empty2H\n" +
-	"\fLoginService\x128\n" +
-	"\x05Login\x12\x16.tenantpb.LoginRequest\x1a\x17.tenantpb.LoginResponseB=Z;github.com/turbo514/shortenurl-v2/shared/gen/proto/tenantpbb\x06proto3"
+	"CreateUser\x12\x1b.tenantpb.CreateUserRequest\x1a\x16.google.protobuf.Empty\x128\n" +
+	"\x05Login\x12\x16.tenantpb.LoginRequest\x1a\x17.tenantpb.LoginResponse2\x0e\n" +
+	"\fLoginServiceB=Z;github.com/turbo514/shortenurl-v2/shared/gen/proto/tenantpbb\x06proto3"
 
 var (
 	file_tenant_tenant_proto_rawDescOnce sync.Once
@@ -333,10 +333,10 @@ var file_tenant_tenant_proto_goTypes = []any{
 var file_tenant_tenant_proto_depIdxs = []int32{
 	0, // 0: tenantpb.TenantService.CreateTenant:input_type -> tenantpb.CreateTenantRequest
 	2, // 1: tenantpb.TenantService.CreateUser:input_type -> tenantpb.CreateUserRequest
-	3, // 2: tenantpb.LoginService.Login:input_type -> tenantpb.LoginRequest
+	3, // 2: tenantpb.TenantService.Login:input_type -> tenantpb.LoginRequest
 	1, // 3: tenantpb.TenantService.CreateTenant:output_type -> tenantpb.CreateTenantResponse
 	5, // 4: tenantpb.TenantService.CreateUser:output_type -> google.protobuf.Empty
-	4, // 5: tenantpb.LoginService.Login:output_type -> tenantpb.LoginResponse
+	4, // 5: tenantpb.TenantService.Login:output_type -> tenantpb.LoginResponse
 	3, // [3:6] is the sub-list for method output_type
 	0, // [0:3] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name

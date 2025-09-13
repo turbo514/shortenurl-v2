@@ -8,10 +8,10 @@ import "google/protobuf/empty.proto";
 service TenantService {
     rpc CreateTenant(CreateTenantRequest) returns(CreateTenantResponse);
     rpc CreateUser(CreateUserRequest) returns(google.protobuf.Empty);
+    rpc Login(LoginRequest) returns(LoginResponse);
 }
 
 service LoginService {
-    rpc Login(LoginRequest) returns(LoginResponse);
 }
 
 message CreateTenantRequest {

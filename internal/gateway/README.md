@@ -16,7 +16,7 @@ http://localhost:8080/v1/
 - 请求消息体
 ```json
 {
-    "name": "公司a",
+    "name": "公司a"
 }
 ```
 
@@ -24,7 +24,7 @@ http://localhost:8080/v1/
 ```json
 {
     "tenant_id":"01859604-0c2d-7d84-a1a7-0242ac130002",
-    "api_key":"123456",
+    "api_key":"123456"
 }
 ```
 
