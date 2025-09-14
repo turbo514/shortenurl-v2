@@ -3,6 +3,7 @@ module github.com/turbo514/shortenurl-v2/shared
 go 1.24.2
 
 require (
+	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/spf13/viper v1.21.0
 	google.golang.org/grpc v1.75.1
 	google.golang.org/protobuf v1.36.9

@@ -11,9 +11,6 @@ service TenantService {
     rpc Login(LoginRequest) returns(LoginResponse);
 }
 
-service LoginService {
-}
-
 message CreateTenantRequest {
     string name = 1;
 }

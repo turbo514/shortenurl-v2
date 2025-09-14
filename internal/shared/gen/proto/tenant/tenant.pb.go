@@ -306,8 +306,7 @@ const file_tenant_tenant_proto_rawDesc = "" +
 	"\fCreateTenant\x12\x1d.tenantpb.CreateTenantRequest\x1a\x1e.tenantpb.CreateTenantResponse\x12A\n" +
 	"\n" +
 	"CreateUser\x12\x1b.tenantpb.CreateUserRequest\x1a\x16.google.protobuf.Empty\x128\n" +
-	"\x05Login\x12\x16.tenantpb.LoginRequest\x1a\x17.tenantpb.LoginResponse2\x0e\n" +
-	"\fLoginServiceB=Z;github.com/turbo514/shortenurl-v2/shared/gen/proto/tenantpbb\x06proto3"
+	"\x05Login\x12\x16.tenantpb.LoginRequest\x1a\x17.tenantpb.LoginResponseB=Z;github.com/turbo514/shortenurl-v2/shared/gen/proto/tenantpbb\x06proto3"
 
 var (
 	file_tenant_tenant_proto_rawDescOnce sync.Once
@@ -357,7 +356,7 @@ func file_tenant_tenant_proto_init() {
 			NumEnums:      0,
 			NumMessages:   5,
 			NumExtensions: 0,
-			NumServices:   2,
+			NumServices:   1,
 		},
 		GoTypes:           file_tenant_tenant_proto_goTypes,
 		DependencyIndexes: file_tenant_tenant_proto_depIdxs,
