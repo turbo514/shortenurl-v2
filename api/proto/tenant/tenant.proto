@@ -7,7 +7,7 @@ import "google/protobuf/empty.proto";
 
 service TenantService {
     rpc CreateTenant(CreateTenantRequest) returns(CreateTenantResponse);
-    rpc CreateUser(CreateUserRequest) returns(google.protobuf.Empty);
+    rpc CreateUser(CreateUserRequest) returns(CreateUserResponse);
     rpc Login(LoginRequest) returns(LoginResponse);
 }
 
@@ -27,9 +27,14 @@ message CreateUserRequest {
     string password = 4;
 }
 
+message CreateUserResponse {
+    string user_id = 1;
+}
+
 message LoginRequest {
     string name = 1;
-    string password = 2;
+    string tenant_id = 2;
+    string password = 3;
 }
 
 message LoginResponse {

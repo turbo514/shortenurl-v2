@@ -1,0 +1,17 @@
+version: 2
+sql:
+  - engine: mysql
+    schema: ../migrations
+    queries: sql
+    gen:
+      go:
+        package: model
+        out: model
+        sql_package: database/sql
+        sql_driver: github.com/go-sql-driver/mysql
+        overrides:
+          - db_type: "timestamp"
+            nullable: true
+            go_type:
+              type: "*time.Time"
+

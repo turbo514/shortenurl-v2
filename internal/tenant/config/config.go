@@ -3,20 +3,27 @@ package config
 import (
 	"fmt"
 	"github.com/spf13/viper"
+	"github.com/turbo514/shortenurl-v2/shared/commonconfig"
 )
 
 type Config struct {
-	Server struct {
-		Port int `mapstructure:"port"`
-	} `mapstructure:"server"`
-	Database struct {
-		Username string `mapstructure:"username"`
-		Password string `mapstructure:"password"`
-		Host     string `mapstructure:"host"`
-		Port     int    `mapstructure:"port"`
-		Dbname   string `mapstructure:"dbname"`
-		Options  string `mapstructure:"options"`
-	} `mapstructure:"database"`
+	Common   commonconfig.CommonConfig `mapstructure:"common"`
+	Server   ServerConfig              `mapstructure:"server"`
+	Database DatabaseConfig            `mapstructure:"database"`
+}
+
+type ServerConfig struct {
+	Port int `mapstructure:"port"`
+}
+
+type DatabaseConfig struct {
+	Host              string `mapstructure:"host"`
+	Port              int    `mapstructure:"port"`
+	Username          string `mapstructure:"username"`
+	Password          string `mapstructure:"password"`
+	Dbname            string `mapstructure:"dbname"`
+	Options           string `mapstructure:"options"`
+	MigrationFilePath string `mapstructure:"migration_file_path"`
 }
 
 func NewConfig(v *viper.Viper) (*Config, error) {

@@ -17,7 +17,7 @@ var _ ITenantService = (*TenantService)(nil)
 type ITenantService interface {
 	CreateTenant(ctx context.Context, name string) (*model.Tenant, error)
 	CreateUser(ctx context.Context, tenantId uuid.UUID, apiKey string, name string, password string) (*model.User, error)
-	Login(ctx context.Context, name string, password string) (*model.User, error)
+	Login(ctx context.Context, name string, password string, tenantID string) (*model.User, error)
 }
 
 type TenantService struct {
@@ -84,8 +84,12 @@ func (s *TenantService) CreateUser(ctx context.Context, tenantId uuid.UUID, apiK
 	return user, nil
 }
 
-func (s *TenantService) Login(ctx context.Context, name string, password string) (*model.User, error) {
-	user, err := s.userRepo.FindByName(ctx, name)
+func (s *TenantService) Login(ctx context.Context, name string, password string, tenantID string) (*model.User, error) {
+	tenantId, err := uuid.Parse(tenantID)
+	if err != nil {
+		return nil, fmt.Errorf("租户ID解析失败: %w", err)
+	}
+	user, err := s.userRepo.FindByNameAndTenantID(ctx, name, tenantId[:])
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, fmt.Errorf("用户名或密码错误")

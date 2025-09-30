@@ -1,0 +1,12 @@
+common:
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+  redis:
+    host: 127.0.0.1
+    port: 6379
+  service:
+    tenant_name: tenant-service
+    link_name: link-service

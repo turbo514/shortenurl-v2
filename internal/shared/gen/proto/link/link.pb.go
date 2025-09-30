@@ -9,6 +9,7 @@ package linkpb
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -24,8 +25,9 @@ const (
 type CreateLinkRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	TenantId      string                 `protobuf:"bytes,1,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
-	ApiKey        string                 `protobuf:"bytes,2,opt,name=api_key,json=apiKey,proto3" json:"api_key,omitempty"`
+	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	OriginalUrl   string                 `protobuf:"bytes,3,opt,name=original_url,json=originalUrl,proto3" json:"original_url,omitempty"`
+	Expiration    *durationpb.Duration   `protobuf:"bytes,4,opt,name=expiration,proto3" json:"expiration,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -67,9 +69,9 @@ func (x *CreateLinkRequest) GetTenantId() string {
 	return ""
 }
 
-func (x *CreateLinkRequest) GetApiKey() string {
+func (x *CreateLinkRequest) GetUserId() string {
 	if x != nil {
-		return x.ApiKey
+		return x.UserId
 	}
 	return ""
 }
@@ -79,6 +81,13 @@ func (x *CreateLinkRequest) GetOriginalUrl() string {
 		return x.OriginalUrl
 	}
 	return ""
+}
+
+func (x *CreateLinkRequest) GetExpiration() *durationpb.Duration {
+	if x != nil {
+		return x.Expiration
+	}
+	return nil
 }
 
 type CreateLinkResponse struct {
@@ -136,6 +145,9 @@ func (x *CreateLinkResponse) GetShortCode() string {
 type ResolveLinkRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ShortCode     string                 `protobuf:"bytes,1,opt,name=short_code,json=shortCode,proto3" json:"short_code,omitempty"`
+	IpAddress     []byte                 `protobuf:"bytes,2,opt,name=ip_address,json=ipAddress,proto3" json:"ip_address,omitempty"`
+	UserAgent     string                 `protobuf:"bytes,3,opt,name=user_agent,json=userAgent,proto3" json:"user_agent,omitempty"`
+	Referrer      string                 `protobuf:"bytes,4,opt,name=referrer,proto3" json:"referrer,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -173,6 +185,27 @@ func (*ResolveLinkRequest) Descriptor() ([]byte, []int) {
 func (x *ResolveLinkRequest) GetShortCode() string {
 	if x != nil {
 		return x.ShortCode
+	}
+	return ""
+}
+
+func (x *ResolveLinkRequest) GetIpAddress() []byte {
+	if x != nil {
+		return x.IpAddress
+	}
+	return nil
+}
+
+func (x *ResolveLinkRequest) GetUserAgent() string {
+	if x != nil {
+		return x.UserAgent
+	}
+	return ""
+}
+
+func (x *ResolveLinkRequest) GetReferrer() string {
+	if x != nil {
+		return x.Referrer
 	}
 	return ""
 }
@@ -225,18 +258,26 @@ var File_link_link_proto protoreflect.FileDescriptor
 
 const file_link_link_proto_rawDesc = "" +
 	"\n" +
-	"\x0flink/link.proto\x12\x06linkpb\"l\n" +
+	"\x0flink/link.proto\x12\x06linkpb\x1a\x1egoogle/protobuf/duration.proto\"\xa7\x01\n" +
 	"\x11CreateLinkRequest\x12\x1b\n" +
 	"\ttenant_id\x18\x01 \x01(\tR\btenantId\x12\x17\n" +
-	"\aapi_key\x18\x02 \x01(\tR\x06apiKey\x12!\n" +
-	"\foriginal_url\x18\x03 \x01(\tR\voriginalUrl\"V\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\x12!\n" +
+	"\foriginal_url\x18\x03 \x01(\tR\voriginalUrl\x129\n" +
+	"\n" +
+	"expiration\x18\x04 \x01(\v2\x19.google.protobuf.DurationR\n" +
+	"expiration\"V\n" +
 	"\x12CreateLinkResponse\x12!\n" +
 	"\foriginal_url\x18\x01 \x01(\tR\voriginalUrl\x12\x1d\n" +
 	"\n" +
-	"short_code\x18\x02 \x01(\tR\tshortCode\"3\n" +
+	"short_code\x18\x02 \x01(\tR\tshortCode\"\x8d\x01\n" +
 	"\x12ResolveLinkRequest\x12\x1d\n" +
 	"\n" +
-	"short_code\x18\x01 \x01(\tR\tshortCode\"8\n" +
+	"short_code\x18\x01 \x01(\tR\tshortCode\x12\x1d\n" +
+	"\n" +
+	"ip_address\x18\x02 \x01(\fR\tipAddress\x12\x1d\n" +
+	"\n" +
+	"user_agent\x18\x03 \x01(\tR\tuserAgent\x12\x1a\n" +
+	"\breferrer\x18\x04 \x01(\tR\breferrer\"8\n" +
 	"\x13ResolveLinkResponse\x12!\n" +
 	"\foriginal_url\x18\x01 \x01(\tR\voriginalUrl2\x9a\x01\n" +
 	"\vLinkService\x12C\n" +
@@ -262,17 +303,19 @@ var file_link_link_proto_goTypes = []any{
 	(*CreateLinkResponse)(nil),  // 1: linkpb.CreateLinkResponse
 	(*ResolveLinkRequest)(nil),  // 2: linkpb.ResolveLinkRequest
 	(*ResolveLinkResponse)(nil), // 3: linkpb.ResolveLinkResponse
+	(*durationpb.Duration)(nil), // 4: google.protobuf.Duration
 }
 var file_link_link_proto_depIdxs = []int32{
-	0, // 0: linkpb.LinkService.CreateLink:input_type -> linkpb.CreateLinkRequest
-	2, // 1: linkpb.LinkService.ResolveLink:input_type -> linkpb.ResolveLinkRequest
-	1, // 2: linkpb.LinkService.CreateLink:output_type -> linkpb.CreateLinkResponse
-	3, // 3: linkpb.LinkService.ResolveLink:output_type -> linkpb.ResolveLinkResponse
-	2, // [2:4] is the sub-list for method output_type
-	0, // [0:2] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	4, // 0: linkpb.CreateLinkRequest.expiration:type_name -> google.protobuf.Duration
+	0, // 1: linkpb.LinkService.CreateLink:input_type -> linkpb.CreateLinkRequest
+	2, // 2: linkpb.LinkService.ResolveLink:input_type -> linkpb.ResolveLinkRequest
+	1, // 3: linkpb.LinkService.CreateLink:output_type -> linkpb.CreateLinkResponse
+	3, // 4: linkpb.LinkService.ResolveLink:output_type -> linkpb.ResolveLinkResponse
+	3, // [3:5] is the sub-list for method output_type
+	1, // [1:3] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_link_link_proto_init() }

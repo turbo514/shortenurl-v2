@@ -4,27 +4,75 @@ import (
 	"crypto/ecdsa"
 	"crypto/x509"
 	"encoding/pem"
+	"errors"
 	"fmt"
 	"time"
 )
 
 import "github.com/golang-jwt/jwt/v5"
 
-func GenerateToken(identify string, key []byte) (string, error) {
-	claims := jwt.RegisteredClaims{
-		Issuer:    "api-gateway service",
-		Subject:   identify,
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 999)), // TODO: 修改时间
+// FIXME: 以后再来改造,目标是类型安全和拓展性
+// FIXME: 改用ES256
+
+var hs256key = []byte("123456")
+
+type GeneralClaims struct {
+	//Type string
+	M map[string]interface{}
+	jwt.RegisteredClaims
+}
+
+//type UserClaims struct {
+//	UserID   uuid.UUID `json:"user_id"`
+//	TenantID uuid.UUID `json:"tenant_id"`
+//	jwt.RegisteredClaims
+//}
+//
+//func NewUserClaims(userID uuid.UUID, tenantID uuid.UUID) *UserClaims {
+//	return &UserClaims{
+//		UserID:   userID,
+//		TenantID: tenantID,
+//	}
+//}
+
+func GenerateToken(data map[string]any, key []byte, issuer string) (string, error) {
+	claims := GeneralClaims{
+		M: data,
+		RegisteredClaims: jwt.RegisteredClaims{
+			Issuer:    issuer,
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24 * 7)),
+		},
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodES256, claims)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	privateKey, err := loadECDSAPrivateKey(key)
+	//privateKey, err := loadECDSAPrivateKey(key)
+	//if err != nil {
+	//	return "", err
+	//}
+
+	return token.SignedString(hs256key)
+}
+
+func ParseToken(tokenString string, key []byte) (*GeneralClaims, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &GeneralClaims{}, func(t *jwt.Token) (any, error) {
+		return hs256key, nil
+	})
+
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return token.SignedString(privateKey)
 
+	if !token.Valid {
+		return nil, errors.New("非法Token")
+	}
+
+	claims, ok := token.Claims.(*GeneralClaims)
+	if !ok {
+		return nil, errors.New("Token解析失败")
+	}
+
+	return claims, nil
 }
 
 func loadECDSAPrivateKey(pemData []byte) (*ecdsa.PrivateKey, error) {

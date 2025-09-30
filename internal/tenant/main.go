@@ -1,9 +1,12 @@
 package main
 
 import (
+	"errors"
 	"fmt"
-	viper "github.com/turbo514/shortenurl-v2/shared/config"
+	"github.com/golang-migrate/migrate/v4"
+	viper "github.com/turbo514/shortenurl-v2/shared/commonconfig"
 	tenantpb "github.com/turbo514/shortenurl-v2/shared/gen/proto/tenant"
+	"github.com/turbo514/shortenurl-v2/shared/migrate_helper"
 	"github.com/turbo514/shortenurl-v2/tenant/config"
 	"github.com/turbo514/shortenurl-v2/tenant/controller"
 	"github.com/turbo514/shortenurl-v2/tenant/dao/repository"
@@ -17,9 +20,10 @@ import (
 )
 
 const mysqldsn = "%s:%s@tcp(%s:%d)/%s?%s"
+const migratedsn = "mysql://%s:%s@tcp(%s:%d)/%s?%s"
 
 func main() {
-	v, err := viper.NewViper("global", "../shared/config/", "config", "./config/")
+	v, err := viper.NewViper("global", "../shared/commonconfig/", "config", "./config/")
 	if err != nil {
 		panic(err)
 	}
@@ -37,6 +41,17 @@ func main() {
 	if err != nil {
 		slog.Error("连接数据库失败", "err", err.Error())
 		return
+	}
+
+	// 数据库迁移
+	if err := migrate_helper.Up(
+		cfg.Database.MigrationFilePath,
+		fmt.Sprintf(migratedsn, cfg.Database.Username, cfg.Database.Password, cfg.Database.Host, cfg.Database.Port, cfg.Database.Dbname, cfg.Database.Options),
+	); err != nil {
+		if !errors.Is(err, migrate.ErrNoChange) {
+			slog.Error("数据库迁移失败", "err", err.Error())
+			return
+		}
 	}
 
 	userRepo := repository.NewUserRepo(db)

@@ -1,0 +1,23 @@
+services:
+  mysql-dev:
+    image: mysql:8
+    restart: on-failure
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=1234
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+  redis-dev:
+    image: redis:8
+    restart: on-failure
+    ports:
+      - "6379:6379"
+  rabbitmq-dev:
+    image: rabbitmq:4-management
+    restart: on-failure
+    ports:
+      - "5672:5672"
+      -  "15672:15672"

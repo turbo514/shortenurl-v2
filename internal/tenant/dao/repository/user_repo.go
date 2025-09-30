@@ -8,7 +8,7 @@ import (
 
 type IUserRepo interface {
 	Create(context.Context, *model.User) error
-	FindByName(ctx context.Context, name string) (*model.User, error)
+	FindByNameAndTenantID(ctx context.Context, name string, tenantID []byte) (*model.User, error)
 }
 
 var _ IUserRepo = (*UserRepo)(nil)
@@ -25,9 +25,9 @@ func (repo *UserRepo) Create(ctx context.Context, user *model.User) error {
 	return repo.db.WithContext(ctx).Create(user).Error
 }
 
-func (repo *UserRepo) FindByName(ctx context.Context, name string) (*model.User, error) {
+func (repo *UserRepo) FindByNameAndTenantID(ctx context.Context, name string, tenantID []byte) (*model.User, error) {
 	user := &model.User{}
-	if err := repo.db.WithContext(ctx).Where("name = ?", name).First(&user).Error; err != nil {
+	if err := repo.db.WithContext(ctx).Where("tenant_id", tenantID).Where("name = ?", name).First(&user).Error; err != nil {
 		return nil, err
 	}
 	return user, nil

@@ -9,7 +9,7 @@ package tenantpb
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
+	_ "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -186,17 +186,62 @@ func (x *CreateUserRequest) GetPassword() string {
 	return ""
 }
 
+type CreateUserResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateUserResponse) Reset() {
+	*x = CreateUserResponse{}
+	mi := &file_tenant_tenant_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateUserResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateUserResponse) ProtoMessage() {}
+
+func (x *CreateUserResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_tenant_tenant_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateUserResponse.ProtoReflect.Descriptor instead.
+func (*CreateUserResponse) Descriptor() ([]byte, []int) {
+	return file_tenant_tenant_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *CreateUserResponse) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
 type LoginRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
+	TenantId      string                 `protobuf:"bytes,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+	Password      string                 `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *LoginRequest) Reset() {
 	*x = LoginRequest{}
-	mi := &file_tenant_tenant_proto_msgTypes[3]
+	mi := &file_tenant_tenant_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -208,7 +253,7 @@ func (x *LoginRequest) String() string {
 func (*LoginRequest) ProtoMessage() {}
 
 func (x *LoginRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_tenant_tenant_proto_msgTypes[3]
+	mi := &file_tenant_tenant_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -221,12 +266,19 @@ func (x *LoginRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LoginRequest.ProtoReflect.Descriptor instead.
 func (*LoginRequest) Descriptor() ([]byte, []int) {
-	return file_tenant_tenant_proto_rawDescGZIP(), []int{3}
+	return file_tenant_tenant_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *LoginRequest) GetName() string {
 	if x != nil {
 		return x.Name
+	}
+	return ""
+}
+
+func (x *LoginRequest) GetTenantId() string {
+	if x != nil {
+		return x.TenantId
 	}
 	return ""
 }
@@ -247,7 +299,7 @@ type LoginResponse struct {
 
 func (x *LoginResponse) Reset() {
 	*x = LoginResponse{}
-	mi := &file_tenant_tenant_proto_msgTypes[4]
+	mi := &file_tenant_tenant_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -259,7 +311,7 @@ func (x *LoginResponse) String() string {
 func (*LoginResponse) ProtoMessage() {}
 
 func (x *LoginResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_tenant_tenant_proto_msgTypes[4]
+	mi := &file_tenant_tenant_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -272,7 +324,7 @@ func (x *LoginResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LoginResponse.ProtoReflect.Descriptor instead.
 func (*LoginResponse) Descriptor() ([]byte, []int) {
-	return file_tenant_tenant_proto_rawDescGZIP(), []int{4}
+	return file_tenant_tenant_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *LoginResponse) GetToken() string {
@@ -296,16 +348,19 @@ const file_tenant_tenant_proto_rawDesc = "" +
 	"\ttenant_id\x18\x01 \x01(\tR\btenantId\x12\x17\n" +
 	"\aapi_key\x18\x02 \x01(\tR\x06apiKey\x12\x12\n" +
 	"\x04name\x18\x03 \x01(\tR\x04name\x12\x1a\n" +
-	"\bpassword\x18\x04 \x01(\tR\bpassword\">\n" +
+	"\bpassword\x18\x04 \x01(\tR\bpassword\"-\n" +
+	"\x12CreateUserResponse\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\"[\n" +
 	"\fLoginRequest\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1a\n" +
-	"\bpassword\x18\x02 \x01(\tR\bpassword\"%\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1b\n" +
+	"\ttenant_id\x18\x02 \x01(\tR\btenantId\x12\x1a\n" +
+	"\bpassword\x18\x03 \x01(\tR\bpassword\"%\n" +
 	"\rLoginResponse\x12\x14\n" +
-	"\x05token\x18\x01 \x01(\tR\x05token2\xdb\x01\n" +
+	"\x05token\x18\x01 \x01(\tR\x05token2\xe1\x01\n" +
 	"\rTenantService\x12M\n" +
-	"\fCreateTenant\x12\x1d.tenantpb.CreateTenantRequest\x1a\x1e.tenantpb.CreateTenantResponse\x12A\n" +
+	"\fCreateTenant\x12\x1d.tenantpb.CreateTenantRequest\x1a\x1e.tenantpb.CreateTenantResponse\x12G\n" +
 	"\n" +
-	"CreateUser\x12\x1b.tenantpb.CreateUserRequest\x1a\x16.google.protobuf.Empty\x128\n" +
+	"CreateUser\x12\x1b.tenantpb.CreateUserRequest\x1a\x1c.tenantpb.CreateUserResponse\x128\n" +
 	"\x05Login\x12\x16.tenantpb.LoginRequest\x1a\x17.tenantpb.LoginResponseB=Z;github.com/turbo514/shortenurl-v2/shared/gen/proto/tenantpbb\x06proto3"
 
 var (
@@ -320,22 +375,22 @@ func file_tenant_tenant_proto_rawDescGZIP() []byte {
 	return file_tenant_tenant_proto_rawDescData
 }
 
-var file_tenant_tenant_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_tenant_tenant_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_tenant_tenant_proto_goTypes = []any{
 	(*CreateTenantRequest)(nil),  // 0: tenantpb.CreateTenantRequest
 	(*CreateTenantResponse)(nil), // 1: tenantpb.CreateTenantResponse
 	(*CreateUserRequest)(nil),    // 2: tenantpb.CreateUserRequest
-	(*LoginRequest)(nil),         // 3: tenantpb.LoginRequest
-	(*LoginResponse)(nil),        // 4: tenantpb.LoginResponse
-	(*emptypb.Empty)(nil),        // 5: google.protobuf.Empty
+	(*CreateUserResponse)(nil),   // 3: tenantpb.CreateUserResponse
+	(*LoginRequest)(nil),         // 4: tenantpb.LoginRequest
+	(*LoginResponse)(nil),        // 5: tenantpb.LoginResponse
 }
 var file_tenant_tenant_proto_depIdxs = []int32{
 	0, // 0: tenantpb.TenantService.CreateTenant:input_type -> tenantpb.CreateTenantRequest
 	2, // 1: tenantpb.TenantService.CreateUser:input_type -> tenantpb.CreateUserRequest
-	3, // 2: tenantpb.TenantService.Login:input_type -> tenantpb.LoginRequest
+	4, // 2: tenantpb.TenantService.Login:input_type -> tenantpb.LoginRequest
 	1, // 3: tenantpb.TenantService.CreateTenant:output_type -> tenantpb.CreateTenantResponse
-	5, // 4: tenantpb.TenantService.CreateUser:output_type -> google.protobuf.Empty
-	4, // 5: tenantpb.TenantService.Login:output_type -> tenantpb.LoginResponse
+	3, // 4: tenantpb.TenantService.CreateUser:output_type -> tenantpb.CreateUserResponse
+	5, // 5: tenantpb.TenantService.Login:output_type -> tenantpb.LoginResponse
 	3, // [3:6] is the sub-list for method output_type
 	0, // [0:3] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -354,7 +409,7 @@ func file_tenant_tenant_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_tenant_tenant_proto_rawDesc), len(file_tenant_tenant_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

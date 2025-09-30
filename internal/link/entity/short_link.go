@@ -7,12 +7,21 @@ import (
 )
 
 type ShortLink struct {
-	Code        string
+	ID          uuid.UUID
+	ShortCode   string
 	OriginalURL string
 	TenantID    uuid.UUID
-	ExpireAt    time.Time
+	UserID      uuid.UUID
+	ExpireAt    *time.Time
 }
 
 func (l *ShortLink) IsExpired() bool {
-	return time.Now().After(l.ExpireAt)
+	if l.ExpireAt != nil {
+		return time.Now().After(*(l.ExpireAt))
+	}
+	return false
+}
+
+func (l *ShortLink) IsInvalid() bool {
+	return l.ID == uuid.Nil
 }

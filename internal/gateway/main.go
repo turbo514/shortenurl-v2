@@ -6,7 +6,7 @@ import (
 	"github.com/turbo514/shortenurl-v2/gateway/config"
 	"github.com/turbo514/shortenurl-v2/gateway/router"
 	"github.com/turbo514/shortenurl-v2/shared/client"
-	viper "github.com/turbo514/shortenurl-v2/shared/config"
+	viper "github.com/turbo514/shortenurl-v2/shared/commonconfig"
 )
 
 func main() {

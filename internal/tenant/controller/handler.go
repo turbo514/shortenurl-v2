@@ -6,7 +6,6 @@ import (
 	"github.com/google/uuid"
 	tenantpb "github.com/turbo514/shortenurl-v2/shared/gen/proto/tenant"
 	"github.com/turbo514/shortenurl-v2/tenant/service"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type ServiceHandler struct {
@@ -37,20 +36,24 @@ func (h *ServiceHandler) CreateTenant(ctx context.Context, req *tenantpb.CreateT
 		ApiKey:   tenant.ApiKey,
 	}, nil
 }
-func (h *ServiceHandler) CreateUser(ctx context.Context, req *tenantpb.CreateUserRequest) (*emptypb.Empty, error) {
+func (h *ServiceHandler) CreateUser(ctx context.Context, req *tenantpb.CreateUserRequest) (*tenantpb.CreateUserResponse, error) {
 	tenantId, err := uuid.Parse(req.TenantId)
 	if err != nil {
 		return nil, fmt.Errorf("uuid解析错误: %w", err)
 	}
-	_, err = h.tenantService.CreateUser(ctx, tenantId, req.ApiKey, req.Name, req.Password)
+	user, err := h.tenantService.CreateUser(ctx, tenantId, req.ApiKey, req.Name, req.Password)
 	if err != nil {
 		return nil, fmt.Errorf("用户创建失败: %w", err)
 	}
 
-	return &emptypb.Empty{}, nil
+	userId, err := uuid.FromBytes(user.ID)
+	if err != nil {
+		return nil, fmt.Errorf("转换uuid错误: %w", err)
+	}
+	return &tenantpb.CreateUserResponse{UserId: userId.String()}, nil
 }
 func (h *ServiceHandler) Login(ctx context.Context, req *tenantpb.LoginRequest) (*tenantpb.LoginResponse, error) {
-	user, err := h.tenantService.Login(ctx, req.Name, req.Password)
+	user, err := h.tenantService.Login(ctx, req.Name, req.Password, req.TenantId)
 	if err != nil {
 		return nil, err
 	}
