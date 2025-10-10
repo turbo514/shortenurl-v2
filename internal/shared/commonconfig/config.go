@@ -15,4 +15,16 @@ type CommonConfig struct {
 		TenantName string `mapstructure:"tenant_name"`
 		LinkName   string `mapstructure:"link_name"`
 	} `mapstructure:"service"`
+	Jaeger JaegerConfig `mapstructure:"jaeger"`
+}
+
+type ServiceInfo struct {
+	Name    string `mapstructure:"name"`
+	Version string `mapstructure:"version"`
+	Desc    string `mapstructure:"desc"`
+}
+
+type JaegerConfig struct {
+	Host     string `mapstructure:"host"`
+	GrpcPort int    `mapstructure:"grpc_port"`
 }

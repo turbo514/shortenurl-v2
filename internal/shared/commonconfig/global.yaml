@@ -8,5 +8,8 @@ common:
     host: 127.0.0.1
     port: 6379
   service:
-    tenant_name: tenant-service
-    link_name: link-service
+    tenant_name: tenant_service
+    link_name: shortlink_service
+  jaeger:
+    host: 127.0.0.1
+    grpc_port: 4317

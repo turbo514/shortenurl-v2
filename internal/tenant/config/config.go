@@ -7,9 +7,10 @@ import (
 )
 
 type Config struct {
-	Common   commonconfig.CommonConfig `mapstructure:"common"`
-	Server   ServerConfig              `mapstructure:"server"`
-	Database DatabaseConfig            `mapstructure:"database"`
+	Common      commonconfig.CommonConfig `mapstructure:"common"`
+	Server      ServerConfig              `mapstructure:"server"`
+	Database    DatabaseConfig            `mapstructure:"database"`
+	ServiceInfo commonconfig.ServiceInfo  `mapstructure:"service_info"`
 }
 
 type ServerConfig struct {

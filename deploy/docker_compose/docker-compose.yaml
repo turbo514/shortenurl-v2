@@ -21,3 +21,14 @@ services:
     ports:
       - "5672:5672"
       -  "15672:15672"
+  jaeger-dev:
+    image: jaegertracing/jaeger
+    restart: on-failure
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+    environment:
+      - LOG_LEVEL=debug
+
+    

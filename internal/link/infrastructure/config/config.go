@@ -10,6 +10,7 @@ type Config struct {
 	Common         commonconfig.CommonConfig `mapstructure:"common"`
 	Server         ServerConfig              `mapstructure:"server"`
 	DatabaseConfig DatabaseConfig            `mapstructure:"database"`
+	ServiceInfo    commonconfig.ServiceInfo  `mapstructure:"service_info"`
 }
 
 func NewConfig(v *viper.Viper) (*Config, error) {
@@ -21,7 +22,8 @@ func NewConfig(v *viper.Viper) (*Config, error) {
 }
 
 type ServerConfig struct {
-	Port int `mapstructure:"port"`
+	GrpcPort int `mapstructure:"grpc_port"`
+	HttpPort int `mapstructure:"http_port"`
 }
 
 type DatabaseConfig struct {

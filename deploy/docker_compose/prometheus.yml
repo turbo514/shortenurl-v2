@@ -1,0 +1,12 @@
+global:
+  scrape_interval:     15s # 抓取数据的频率，每 15 秒抓取一次
+
+scrape_configs:
+  - job_name: 'link-service'
+    # 覆盖全局默认设置，每5秒从当前任务抓取目标
+    scrape_interval: 5s
+    # 静态配置
+    static_configs:
+      - targets: ['localhost:30002']
+
+

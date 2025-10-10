@@ -8,3 +8,6 @@ database:
   dbname: tenant_dev
   options: charset=utf8&parseTime=True&loc=Local
   migration_file_path: "./migrations/"
+service_info:
+  name: tenant_service
+  version: 1.0.0

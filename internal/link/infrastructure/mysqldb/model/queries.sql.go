@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-const createShortLink = `-- name: CreateShortLink :exec
+const CreateShortLink = `-- name: CreateShortLink :exec
 INSERT INTO links (
     id,tenant_id,user_id,short_code,original_url,created_at,expires_at
 ) VALUES (
@@ -29,7 +29,7 @@ type CreateShortLinkParams struct {
 }
 
 func (q *Queries) CreateShortLink(ctx context.Context, arg CreateShortLinkParams) error {
-	_, err := q.db.ExecContext(ctx, createShortLink,
+	_, err := q.db.ExecContext(ctx, CreateShortLink,
 		arg.ID,
 		arg.TenantID,
 		arg.UserID,
@@ -41,7 +41,7 @@ func (q *Queries) CreateShortLink(ctx context.Context, arg CreateShortLinkParams
 	return err
 }
 
-const getOriginalUrlByCode = `-- name: GetOriginalUrlByCode :one
+const GetOriginalUrlByCode = `-- name: GetOriginalUrlByCode :one
 SELECT id, tenant_id, user_id, short_code, original_url, created_at, expires_at FROM links WHERE short_code = ? AND (expires_at > ? OR expires_at IS NULL)
 `
 
@@ -51,7 +51,7 @@ type GetOriginalUrlByCodeParams struct {
 }
 
 func (q *Queries) GetOriginalUrlByCode(ctx context.Context, arg GetOriginalUrlByCodeParams) (Link, error) {
-	row := q.db.QueryRowContext(ctx, getOriginalUrlByCode, arg.ShortCode, arg.ExpiresAt)
+	row := q.db.QueryRowContext(ctx, GetOriginalUrlByCode, arg.ShortCode, arg.ExpiresAt)
 	var i Link
 	err := row.Scan(
 		&i.ID,

@@ -3,7 +3,6 @@ package cache
 import (
 	"context"
 	"fmt"
-	"github.com/google/uuid"
 	"github.com/maypok86/otter/v2"
 	"github.com/turbo514/shortenurl-v2/link/entity"
 	"github.com/turbo514/shortenurl-v2/shared/zerr"
@@ -32,13 +31,12 @@ func (c *ShortLinkL1Cache) GetLinkByCode(ctx context.Context, code string) (*ent
 	if !exist {
 		return nil, fmt.Errorf("找不到短链接[code: %s]: %w", code, zerr.ErrNotFoundCache)
 	}
-	if val.ID == uuid.Nil {
+	if val.IsInvalid() {
 		return nil, zerr.ErrNotFoundDB
 	}
 	return &val, nil
 }
 
-// id为uuid.Nil代表值不存在
 func (c *ShortLinkL1Cache) PutLinkByCode(ctx context.Context, shortlink *entity.ShortLink, ttl time.Duration) bool {
 	key := "su:links:code:" + shortlink.ShortCode
 	_, ok := c.cache.Set(key, *shortlink)
