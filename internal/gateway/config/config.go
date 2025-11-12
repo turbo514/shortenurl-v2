@@ -2,22 +2,21 @@ package config
 
 import (
 	"fmt"
+	"github.com/turbo514/shortenurl-v2/shared/commonconfig"
 
 	"github.com/spf13/viper"
 )
 
 type Config struct {
-	Server struct {
-		Port int `mapstructure:"port"`
-	} `mapstructure:"server"`
-	Services struct {
-		Link          string `mapstructure:"link"`
-		LinkPort      int    `mapstructure:"link_port"`
-		Tenant        string `mapstructure:"tenant"`
-		TenantPort    int    `mapstructure:"tenant_port"`
-		Analytics     string `mapstructure:"analytics"`
-		AnalyticsPort int    `mapstructure:"analytics_port"`
-	} `mapstructure:"services"`
+	Server            commonconfig.ApiGatewayConfig       `mapstructure:"api-gateway"`
+	ServiceInfo       commonconfig.ServiceInfo            `mapstructure:"service-info"`
+	LinkService       commonconfig.LinkServiceConfig      `mapstructure:"link-service"`
+	TenantService     commonconfig.TenantServiceConfig    `mapstructure:"tenant-service"`
+	AnalyticsService  commonconfig.AnalyticsServiceConfig `mapstructure:"analytics-service"`
+	Jaeger            commonconfig.JaegerConfig           `mapstructure:"jaeger"`
+	Redis             commonconfig.RedisConfig            `mapstructure:"redis"`
+	GlobalRateLimiter commonconfig.RateLimiterConfig      `mapstructure:"global-rate-limiter"`
+	LocalRateLimiter  commonconfig.RateLimiterConfig      `mapstructure:"local-rate-limiter"`
 }
 
 // 直接依赖viper,可能不是个好做法(?)

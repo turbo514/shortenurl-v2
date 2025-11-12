@@ -10,6 +10,7 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
+	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -20,20 +21,207 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type TopLink struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	OriginalUrl   string                 `protobuf:"bytes,2,opt,name=original_url,json=originalUrl,proto3" json:"original_url,omitempty"`
+	ClickTimes    int64                  `protobuf:"varint,3,opt,name=click_times,json=clickTimes,proto3" json:"click_times,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TopLink) Reset() {
+	*x = TopLink{}
+	mi := &file_analytics_analytics_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TopLink) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TopLink) ProtoMessage() {}
+
+func (x *TopLink) ProtoReflect() protoreflect.Message {
+	mi := &file_analytics_analytics_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TopLink.ProtoReflect.Descriptor instead.
+func (*TopLink) Descriptor() ([]byte, []int) {
+	return file_analytics_analytics_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *TopLink) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *TopLink) GetOriginalUrl() string {
+	if x != nil {
+		return x.OriginalUrl
+	}
+	return ""
+}
+
+func (x *TopLink) GetClickTimes() int64 {
+	if x != nil {
+		return x.ClickTimes
+	}
+	return 0
+}
+
+type GetTopNRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	N             int64                  `protobuf:"varint,1,opt,name=n,proto3" json:"n,omitempty"`
+	TenantId      string                 `protobuf:"bytes,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetTopNRequest) Reset() {
+	*x = GetTopNRequest{}
+	mi := &file_analytics_analytics_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetTopNRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetTopNRequest) ProtoMessage() {}
+
+func (x *GetTopNRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_analytics_analytics_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetTopNRequest.ProtoReflect.Descriptor instead.
+func (*GetTopNRequest) Descriptor() ([]byte, []int) {
+	return file_analytics_analytics_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *GetTopNRequest) GetN() int64 {
+	if x != nil {
+		return x.N
+	}
+	return 0
+}
+
+func (x *GetTopNRequest) GetTenantId() string {
+	if x != nil {
+		return x.TenantId
+	}
+	return ""
+}
+
+type GetTopNResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TopLinks      []*TopLink             `protobuf:"bytes,1,rep,name=top_links,json=topLinks,proto3" json:"top_links,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetTopNResponse) Reset() {
+	*x = GetTopNResponse{}
+	mi := &file_analytics_analytics_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetTopNResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetTopNResponse) ProtoMessage() {}
+
+func (x *GetTopNResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_analytics_analytics_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetTopNResponse.ProtoReflect.Descriptor instead.
+func (*GetTopNResponse) Descriptor() ([]byte, []int) {
+	return file_analytics_analytics_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *GetTopNResponse) GetTopLinks() []*TopLink {
+	if x != nil {
+		return x.TopLinks
+	}
+	return nil
+}
+
 var File_analytics_analytics_proto protoreflect.FileDescriptor
 
 const file_analytics_analytics_proto_rawDesc = "" +
 	"\n" +
-	"\x19analytics/analytics.proto\x12\vanalyticspb2\x12\n" +
-	"\x10AnalyticsServiceBIZGgithub.com/turbo514/shortenurl-v2/internal/shared/gen/proto/analyticspbb\x06proto3"
+	"\x19analytics/analytics.proto\x12\vanalyticspb\"]\n" +
+	"\aTopLink\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12!\n" +
+	"\foriginal_url\x18\x02 \x01(\tR\voriginalUrl\x12\x1f\n" +
+	"\vclick_times\x18\x03 \x01(\x03R\n" +
+	"clickTimes\";\n" +
+	"\x0eGetTopNRequest\x12\f\n" +
+	"\x01n\x18\x01 \x01(\x03R\x01n\x12\x1b\n" +
+	"\ttenant_id\x18\x02 \x01(\tR\btenantId\"D\n" +
+	"\x0fGetTopNResponse\x121\n" +
+	"\ttop_links\x18\x01 \x03(\v2\x14.analyticspb.TopLinkR\btopLinks2X\n" +
+	"\x10AnalyticsService\x12D\n" +
+	"\aGetTopN\x12\x1b.analyticspb.GetTopNRequest\x1a\x1c.analyticspb.GetTopNResponseBIZGgithub.com/turbo514/shortenurl-v2/internal/shared/gen/proto/analyticspbb\x06proto3"
 
-var file_analytics_analytics_proto_goTypes = []any{}
+var (
+	file_analytics_analytics_proto_rawDescOnce sync.Once
+	file_analytics_analytics_proto_rawDescData []byte
+)
+
+func file_analytics_analytics_proto_rawDescGZIP() []byte {
+	file_analytics_analytics_proto_rawDescOnce.Do(func() {
+		file_analytics_analytics_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_analytics_analytics_proto_rawDesc), len(file_analytics_analytics_proto_rawDesc)))
+	})
+	return file_analytics_analytics_proto_rawDescData
+}
+
+var file_analytics_analytics_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_analytics_analytics_proto_goTypes = []any{
+	(*TopLink)(nil),         // 0: analyticspb.TopLink
+	(*GetTopNRequest)(nil),  // 1: analyticspb.GetTopNRequest
+	(*GetTopNResponse)(nil), // 2: analyticspb.GetTopNResponse
+}
 var file_analytics_analytics_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	0, // 0: analyticspb.GetTopNResponse.top_links:type_name -> analyticspb.TopLink
+	1, // 1: analyticspb.AnalyticsService.GetTopN:input_type -> analyticspb.GetTopNRequest
+	2, // 2: analyticspb.AnalyticsService.GetTopN:output_type -> analyticspb.GetTopNResponse
+	2, // [2:3] is the sub-list for method output_type
+	1, // [1:2] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_analytics_analytics_proto_init() }
@@ -47,12 +235,13 @@ func file_analytics_analytics_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_analytics_analytics_proto_rawDesc), len(file_analytics_analytics_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   0,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_analytics_analytics_proto_goTypes,
 		DependencyIndexes: file_analytics_analytics_proto_depIdxs,
+		MessageInfos:      file_analytics_analytics_proto_msgTypes,
 	}.Build()
 	File_analytics_analytics_proto = out.File
 	file_analytics_analytics_proto_goTypes = nil

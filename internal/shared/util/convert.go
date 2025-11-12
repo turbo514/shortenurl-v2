@@ -1,6 +1,9 @@
 package util
 
-import "strings"
+import (
+	"github.com/google/uuid"
+	"strings"
+)
 
 // ParseFullMethod 提取grpc服务名和grpc方法名
 func ParseFullMethod(fullMethod string) (serviceName, methodName string) {
@@ -14,4 +17,12 @@ func ParseFullMethod(fullMethod string) (serviceName, methodName string) {
 		methodName = "unknown"
 	}
 	return
+}
+
+func UUIDToRedisMember(id uuid.UUID) string {
+	return id.String()
+}
+
+func RedisMemberToUUID(s string) (uuid.UUID, error) {
+	return uuid.Parse(s)
 }

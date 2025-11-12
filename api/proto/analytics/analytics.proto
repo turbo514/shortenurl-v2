@@ -4,5 +4,20 @@ package analyticspb;
 option go_package = "github.com/turbo514/shortenurl-v2/internal/shared/gen/proto/analyticspb";
 
 service AnalyticsService {
-    // ...
+  rpc GetTopN(GetTopNRequest) returns (GetTopNResponse);
+}
+
+message TopLink {
+  string id = 1;
+  string original_url = 2;
+  int64 click_times = 3;
+}
+
+message GetTopNRequest {
+  int64 n = 1;
+  string tenant_id = 2;
+}
+
+message GetTopNResponse {
+  repeated TopLink top_links = 1;
 }

@@ -12,3 +12,9 @@ link-run:
 
 tenant-run:
 	cd internal/tenant && go run main.go
+
+analytics-run:
+	cd internal/analytics && go run main.go
+
+gateway-run:
+	cd internal/gateway && go run main.go

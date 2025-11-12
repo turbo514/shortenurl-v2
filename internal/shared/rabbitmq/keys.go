@@ -11,8 +11,8 @@ const (
 )
 
 const (
-	AnalyticsClickEventQueue   string = "su.q.prod.analytics.clickevent"
-	UpdateCreateShortLinkQueue string = "su.q.prod.Update.createlink"
+	ClickEventQueue      string = "su.q.prod.analytics.clickevent"
+	CreateShortLinkQueue string = "su.q.prod.Update.createlink"
 )
 
 const (
@@ -20,6 +20,7 @@ const (
 	CreateLink string = "shortlink.create"
 )
 
+// 点击事件交换机
 func InitClickEventExchange(channel *amqp091.Channel) error {
 	if err := channel.ExchangeDeclare(ClickEventExchange, "topic", true, false, false, false, nil); err != nil {
 		return fmt.Errorf("初始化ClickEventExchange失败: %w", err)
@@ -34,8 +35,8 @@ func InitCreateLinkEventExchange(channel *amqp091.Channel) error {
 	return nil
 }
 
-func InitAnalyticsClickEventQueue(channel *amqp091.Channel) error {
-	if _, err := channel.QueueDeclare(AnalyticsClickEventQueue, true, false, false, false, nil); err != nil {
+func InitClickEventQueue(channel *amqp091.Channel) error {
+	if _, err := channel.QueueDeclare(ClickEventQueue, true, false, false, false, nil); err != nil {
 		return fmt.Errorf("初始化AnalyticsClickEventQueue失败: %w", err)
 	}
 
@@ -43,21 +44,21 @@ func InitAnalyticsClickEventQueue(channel *amqp091.Channel) error {
 }
 
 func BindAnalyticsClickEventQueue(channel *amqp091.Channel) error {
-	if err := channel.QueueBind(AnalyticsClickEventQueue, ClickLink, ClickEventExchange, false, nil); err != nil {
+	if err := channel.QueueBind(ClickEventQueue, ClickLink, ClickEventExchange, false, nil); err != nil {
 		return fmt.Errorf("绑定AnalyticsClickEventQueue失败: %w", err)
 	}
 	return nil
 }
 
-func InitUpdateCreateShortLinkQueue(channel *amqp091.Channel) error {
-	if _, err := channel.QueueDeclare(UpdateCreateShortLinkQueue, true, false, false, false, nil); err != nil {
+func InitCreateShortLinkQueue(channel *amqp091.Channel) error {
+	if _, err := channel.QueueDeclare(CreateShortLinkQueue, true, false, false, false, nil); err != nil {
 		return fmt.Errorf("初始化UpdateCreateShortLinkQueue失败: %w", err)
 	}
 	return nil
 }
 
-func InitUpdateCreateLinkEventQueue(channel *amqp091.Channel) error {
-	if err := channel.QueueBind(UpdateCreateShortLinkQueue, CreateLink, CreateLinkEventExchange, false, nil); err != nil {
+func BindUpdateCreateLinkEventQueue(channel *amqp091.Channel) error {
+	if err := channel.QueueBind(CreateShortLinkQueue, CreateLink, CreateLinkEventExchange, false, nil); err != nil {
 		return fmt.Errorf("绑定UpdateCreateLinkEventQueue失败: %w", err)
 	}
 	return nil

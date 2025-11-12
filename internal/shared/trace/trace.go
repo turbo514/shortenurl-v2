@@ -22,7 +22,7 @@ func GetTracer() trace.Tracer {
 	return otel.Tracer(serviceName)
 }
 
-func InitOpenTelemetry(jaegerConfig *commonconfig.JaegerConfig, serviceInfo *commonconfig.ServiceInfo, ctx context.Context) (*sdktrace.TracerProvider, error) {
+func InitOpenTelemetry(ctx context.Context, jaegerConfig *commonconfig.JaegerConfig, serviceInfo *commonconfig.ServiceInfo) (*sdktrace.TracerProvider, error) {
 	// 1. 配置 OTLP Exporter 连接到 Jaeger OTLP 端口
 	conn, err := grpc.NewClient(
 		fmt.Sprintf("%s:%d", jaegerConfig.Host, jaegerConfig.GrpcPort),

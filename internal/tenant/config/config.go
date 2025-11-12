@@ -7,24 +7,11 @@ import (
 )
 
 type Config struct {
-	Common      commonconfig.CommonConfig `mapstructure:"common"`
-	Server      ServerConfig              `mapstructure:"server"`
-	Database    DatabaseConfig            `mapstructure:"database"`
-	ServiceInfo commonconfig.ServiceInfo  `mapstructure:"service_info"`
-}
-
-type ServerConfig struct {
-	Port int `mapstructure:"port"`
-}
-
-type DatabaseConfig struct {
-	Host              string `mapstructure:"host"`
-	Port              int    `mapstructure:"port"`
-	Username          string `mapstructure:"username"`
-	Password          string `mapstructure:"password"`
-	Dbname            string `mapstructure:"dbname"`
-	Options           string `mapstructure:"options"`
-	MigrationFilePath string `mapstructure:"migration_file_path"`
+	Server      commonconfig.TenantServiceConfig `mapstructure:"tenant-service"`
+	Mysql       commonconfig.TenantMysqlConfig   `mapstructure:"tenant-mysql"`
+	ServiceInfo commonconfig.ServiceInfo         `mapstructure:"service-info"`
+	Jaeger      commonconfig.JaegerConfig        `mapstructure:"jaeger"`
+	Prometheus  commonconfig.PrometheusConfig    `mapstructure:"prometheus"`
 }
 
 func NewConfig(v *viper.Viper) (*Config, error) {

@@ -6,10 +6,9 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"github.com/golang-jwt/jwt/v5"
 	"time"
 )
-
-import "github.com/golang-jwt/jwt/v5"
 
 // FIXME: 以后再来改造,目标是类型安全和拓展性
 // FIXME: 改用ES256

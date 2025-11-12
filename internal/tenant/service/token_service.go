@@ -23,6 +23,7 @@ func NewTokenService(privateKeyPath, publicKeyPath string) *TokenService {
 }
 
 func (t TokenService) GenerateToken(ctx context.Context, userID, tenantID uuid.UUID) (string, error) {
+	// TODO: 更新密钥
 	token, err := util.GenerateToken(map[string]any{
 		"user_id":   userID,
 		"tenant_id": tenantID,

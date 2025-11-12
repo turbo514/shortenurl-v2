@@ -1,15 +1,40 @@
-common:
-  rabbitmq:
-    host: 127.0.0.1
-    port: 5672
-    username: guest
-    password: guest
-  redis:
-    host: 127.0.0.1
-    port: 6379
-  service:
-    tenant_name: tenant_service
-    link_name: shortlink_service
-  jaeger:
-    host: 127.0.0.1
-    grpc_port: 4317
+rabbitmq:
+  host: 127.0.0.1
+  port: 5672
+  username: guest
+  password: guest
+redis:
+  host: 127.0.0.1
+  port: 6379
+jaeger:
+  host: 127.0.0.1
+  grpc-port: 4317
+tenant-mysql:
+  host: 127.0.0.1
+  port: 3306
+  username: user
+  password: 1234
+  dbname: tenant_dev
+  options: charset=utf8&parseTime=True&loc=Local
+link-mysql:
+  host: 127.0.0.1
+  port: 3306
+  username: user
+  password: 1234
+  dbname: link_dev
+  options: charset=utf8&parseTime=True&loc=Local
+analytics-clickhouse:
+  host: 127.0.0.1
+  port: 9000
+  username: user
+  password: 1234
+  dbname: default
+link-service:
+  host: 127.0.0.1
+  port: 20002
+tenant-service:
+  host: 127.0.0.1
+  port: 30002
+analytics-service:
+  host: 127.0.0.1
+  port: 40002

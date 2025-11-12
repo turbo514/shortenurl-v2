@@ -7,7 +7,10 @@
 package analyticspb
 
 import (
+	context "context"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -15,10 +18,15 @@ import (
 // Requires gRPC-Go v1.64.0 or later.
 const _ = grpc.SupportPackageIsVersion9
 
+const (
+	AnalyticsService_GetTopN_FullMethodName = "/analyticspb.AnalyticsService/GetTopN"
+)
+
 // AnalyticsServiceClient is the client API for AnalyticsService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AnalyticsServiceClient interface {
+	GetTopN(ctx context.Context, in *GetTopNRequest, opts ...grpc.CallOption) (*GetTopNResponse, error)
 }
 
 type analyticsServiceClient struct {
@@ -29,10 +37,21 @@ func NewAnalyticsServiceClient(cc grpc.ClientConnInterface) AnalyticsServiceClie
 	return &analyticsServiceClient{cc}
 }
 
+func (c *analyticsServiceClient) GetTopN(ctx context.Context, in *GetTopNRequest, opts ...grpc.CallOption) (*GetTopNResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetTopNResponse)
+	err := c.cc.Invoke(ctx, AnalyticsService_GetTopN_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AnalyticsServiceServer is the server API for AnalyticsService service.
 // All implementations must embed UnimplementedAnalyticsServiceServer
 // for forward compatibility.
 type AnalyticsServiceServer interface {
+	GetTopN(context.Context, *GetTopNRequest) (*GetTopNResponse, error)
 	mustEmbedUnimplementedAnalyticsServiceServer()
 }
 
@@ -43,6 +62,9 @@ type AnalyticsServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedAnalyticsServiceServer struct{}
 
+func (UnimplementedAnalyticsServiceServer) GetTopN(context.Context, *GetTopNRequest) (*GetTopNResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTopN not implemented")
+}
 func (UnimplementedAnalyticsServiceServer) mustEmbedUnimplementedAnalyticsServiceServer() {}
 func (UnimplementedAnalyticsServiceServer) testEmbeddedByValue()                          {}
 
@@ -64,13 +86,36 @@ func RegisterAnalyticsServiceServer(s grpc.ServiceRegistrar, srv AnalyticsServic
 	s.RegisterService(&AnalyticsService_ServiceDesc, srv)
 }
 
+func _AnalyticsService_GetTopN_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetTopNRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AnalyticsServiceServer).GetTopN(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AnalyticsService_GetTopN_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AnalyticsServiceServer).GetTopN(ctx, req.(*GetTopNRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AnalyticsService_ServiceDesc is the grpc.ServiceDesc for AnalyticsService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var AnalyticsService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "analyticspb.AnalyticsService",
 	HandlerType: (*AnalyticsServiceServer)(nil),
-	Methods:     []grpc.MethodDesc{},
-	Streams:     []grpc.StreamDesc{},
-	Metadata:    "analytics/analytics.proto",
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetTopN",
+			Handler:    _AnalyticsService_GetTopN_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "analytics/analytics.proto",
 }

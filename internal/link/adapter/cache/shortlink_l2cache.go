@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
-	"github.com/turbo514/shortenurl-v2/link/entity"
+	"github.com/turbo514/shortenurl-v2/link/domain"
 	"github.com/turbo514/shortenurl-v2/shared/zerr"
 	"time"
 )
@@ -22,14 +22,14 @@ func NewShortLinkL2Cache(client *redis.Client) *ShortLinkL2Cache {
 	}
 }
 
-func (c *ShortLinkL2Cache) GetLinkByCode(ctx context.Context, code string) (*entity.ShortLink, error) {
+func (c *ShortLinkL2Cache) GetLinkByCode(ctx context.Context, code string) (*domain.ShortLink, error) {
 	key := "su:links:code:" + code
 	v, err := c.client.Get(ctx, key).Result()
 	if err != nil {
 		return nil, fmt.Errorf("从Redis获取值[code: %s]失败: %w", code, err)
 	}
 
-	shortLink := entity.ShortLink{}
+	shortLink := domain.ShortLink{}
 	if err := json.Unmarshal([]byte(v), &shortLink); err != nil {
 		return nil, fmt.Errorf("解析Json失败: %w", err)
 	}
@@ -40,7 +40,7 @@ func (c *ShortLinkL2Cache) GetLinkByCode(ctx context.Context, code string) (*ent
 	return &shortLink, nil
 }
 
-func (c *ShortLinkL2Cache) PutLinkByCode(ctx context.Context, shortlink *entity.ShortLink, ttl time.Duration) error {
+func (c *ShortLinkL2Cache) PutLinkByCode(ctx context.Context, shortlink *domain.ShortLink, ttl time.Duration) error {
 	key := "su:links:code:" + shortlink.ShortCode
 	v, err := json.Marshal(shortlink)
 	if err != nil {

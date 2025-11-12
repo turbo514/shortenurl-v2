@@ -30,5 +30,18 @@ services:
       - "4318:4318"
     environment:
       - LOG_LEVEL=debug
+  clickhouse-dev:
+    image: clickhouse:latest
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+      - "9009:9009"
+    environment:
+      - CLICKHOUSE_USER=user
+      - CLICKHOUSE_PASSWORD=1234
 
     

@@ -1,0 +1,6 @@
+prometheus:
+  port: 40003
+service-info:
+  name: analytics-service
+  version: 1.0.0
+  desc: analytics-service
