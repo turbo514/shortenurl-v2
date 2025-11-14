@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS default.click_events_write;

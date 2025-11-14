@@ -45,7 +45,8 @@ func main() {
 	ctx := context.Background()
 
 	// --- 读取配置 ---
-	v, err := commonconfig.NewViper("global", "../shared/commonconfig/", "config", "./config/")
+	// 默认为本地开发路径
+	v, err := commonconfig.NewViper(commonconfig.GlobalFile, commonconfig.GlobalPath, commonconfig.ServiceFile, commonconfig.ServicePath)
 	if err != nil {
 		logger.Error("读取配置失败", "err", err.Error())
 		return
@@ -103,7 +104,9 @@ func main() {
 
 	// --- Redis连接 初始化 ---
 	redisClient := redis.NewClient(&redis.Options{
-		Addr: fmt.Sprintf("%s:%d", cfg.Redis.Host, cfg.Redis.Port),
+		Addr:         fmt.Sprintf("%s:%d", cfg.Redis.Host, cfg.Redis.Port),
+		PoolSize:     cfg.Redis.PoolSize,
+		MinIdleConns: cfg.Redis.MinIdleConns,
 	})
 	if err := redisClient.Ping(ctx).Err(); err != nil {
 		logger.Error("redis连接创建失败", "err", err.Error())

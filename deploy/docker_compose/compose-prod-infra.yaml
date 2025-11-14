@@ -1,0 +1,63 @@
+services:
+  mysql-prod:
+    image: mysql:8
+    restart: on-failure
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=1234
+    ports:
+      - "3306:3306"
+    networks:
+      - prod-net
+    volumes:
+      - ./dbinit/prod/mysql_init.sql:/docker-entrypoint-initdb.d/init.sql
+  redis-prod:
+    image: redis:8
+    restart: on-failure
+    ports:
+      - "6379:6379"
+    networks:
+      - prod-net
+  rabbitmq-prod:
+    image: rabbitmq:4-management
+    restart: on-failure
+    ports:
+      - "5672:5672"
+      -  "15672:15672"
+    networks:
+      - prod-net
+  jaeger-prod:
+    image: jaegertracing/jaeger
+    restart: on-failure
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+    networks:
+      - prod-net
+    environment:
+      - LOG_LEVEL=debug
+  clickhouse-prod:
+    image: clickhouse:latest
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+      - "9009:9009"
+    networks:
+      - prod-net
+    environment:
+      - CLICKHOUSE_USER=user
+      - CLICKHOUSE_PASSWORD=1234
+    volumes:
+      - ./dbinit/prod/clickhouse_init.sql:/docker-entrypoint-initdb.d/init.sql
+
+networks:
+  prod-net:
+    driver: bridge
+    name: prod-bridge-network
+

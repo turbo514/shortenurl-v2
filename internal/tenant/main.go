@@ -2,19 +2,16 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"github.com/golang-migrate/migrate/v4"
 	grpcprom "github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus" // Prometheus 指标提供者
 	"github.com/oklog/run"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	viper "github.com/turbo514/shortenurl-v2/shared/commonconfig"
+	"github.com/turbo514/shortenurl-v2/shared/commonconfig"
 	"net/http"
 	"syscall"
 
 	tenantpb "github.com/turbo514/shortenurl-v2/shared/gen/proto/tenant"
-	"github.com/turbo514/shortenurl-v2/shared/migrate_helper"
 	"github.com/turbo514/shortenurl-v2/shared/mylog"
 	myprom "github.com/turbo514/shortenurl-v2/shared/prom"
 	mytrace "github.com/turbo514/shortenurl-v2/shared/trace"
@@ -37,7 +34,7 @@ func main() {
 	ctx := context.Background()
 
 	// --- 获取配置 ---
-	v, err := viper.NewViper("global", "../shared/commonconfig/", "config", "./config/")
+	v, err := commonconfig.NewViper(commonconfig.GlobalFile, commonconfig.GlobalPath, commonconfig.ServiceFile, commonconfig.ServicePath)
 	if err != nil {
 		logger.Error("读取配置失败", "err", err.Error())
 		return
@@ -83,15 +80,15 @@ func main() {
 	}
 
 	// --- 数据库迁移 ---
-	if err := migrate_helper.Up(
-		"./migrations/",
-		fmt.Sprintf("mysql://%s:%s@tcp(%s:%d)/%s?%s", cfg.Mysql.Username, cfg.Mysql.Password, cfg.Mysql.Host, cfg.Mysql.Port, cfg.Mysql.DbName, cfg.Mysql.Options),
-	); err != nil {
-		if !errors.Is(err, migrate.ErrNoChange) {
-			logger.Error("数据库迁移失败", "err", err.Error())
-			return
-		}
-	}
+	//if err := migrate_helper.Up(
+	//	"./migrations/",
+	//	fmt.Sprintf("mysql://%s:%s@tcp(%s:%d)/%s?%s", cfg.Mysql.Username, cfg.Mysql.Password, cfg.Mysql.Host, cfg.Mysql.Port, cfg.Mysql.DbName, cfg.Mysql.Options),
+	//); err != nil {
+	//	if !errors.Is(err, migrate.ErrNoChange) {
+	//		logger.Error("数据库迁移失败", "err", err.Error())
+	//		return
+	//	}
+	//}
 
 	// --- 初始化repository层 ---
 	userRepo := repository.NewUserRepo(db)

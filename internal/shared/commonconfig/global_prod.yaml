@@ -1,0 +1,40 @@
+rabbitmq:
+  host: rabbitmq-prod
+  port: 5672
+  username: guest
+  password: guest
+redis:
+  host: redis-prod
+  port: 6379
+jaeger:
+  host: jaeger-prod
+  grpc-port: 4317
+tenant-mysql:
+  host: mysql-prod
+  port: 3306
+  username: user
+  password: 1234
+  dbname: tenant_prod
+  options: charset=utf8&parseTime=True&loc=Local
+link-mysql:
+  host: mysql-prod
+  port: 3306
+  username: user
+  password: 1234
+  dbname: link_prod
+  options: charset=utf8&parseTime=True&loc=Local
+analytics-clickhouse:
+  host: clickhouse-prod
+  port: 9000
+  username: user
+  password: 1234
+  dbname: default
+link-service:
+  host: link-service
+  port: 20002
+tenant-service:
+  host: tenant-service
+  port: 30002
+analytics-service:
+  host: analytics-service
+  port: 40002

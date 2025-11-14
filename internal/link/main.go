@@ -3,9 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
-	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	grpcprom "github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus" // Prometheus 指标提供者
 	"github.com/maypok86/otter/v2"
@@ -21,7 +19,6 @@ import (
 	"github.com/turbo514/shortenurl-v2/link/infrastructure/rabbitmq_publisher"
 	redisrepo "github.com/turbo514/shortenurl-v2/link/infrastructure/redis_repository"
 	"github.com/turbo514/shortenurl-v2/link/metrics"
-	"github.com/turbo514/shortenurl-v2/shared/migrate_helper"
 	"github.com/turbo514/shortenurl-v2/shared/mylog"
 	myprom "github.com/turbo514/shortenurl-v2/shared/prom"
 	mytrace "github.com/turbo514/shortenurl-v2/shared/trace"
@@ -50,7 +47,7 @@ func main() {
 	ctx := context.Background()
 
 	// --- 获取配置 ---
-	v, err := commonconfig.NewViper("global", "../shared/commonconfig/", "config", "./config/")
+	v, err := commonconfig.NewViper(commonconfig.GlobalFile, commonconfig.GlobalPath, commonconfig.ServiceFile, commonconfig.ServicePath)
 	if err != nil {
 		logger.Error("读取配置失败", "err", err.Error())
 		return
@@ -98,14 +95,14 @@ func main() {
 	defer dbtx.Close()
 
 	// --- 数据库迁移 ---
-	if err := migrate_helper.Up(
-		"./infrastructure/migrations/",
-		fmt.Sprintf("mysql://%s:%s@tcp(%s:%d)/%s?%s", cfg.Mysql.Username, cfg.Mysql.Password, cfg.Mysql.Host, cfg.Mysql.Port, cfg.Mysql.DbName, cfg.Mysql.Options),
-	); err != nil {
-		if !errors.Is(err, migrate.ErrNoChange) {
-			logger.Error("数据库迁移失败: %w", err)
-		}
-	}
+	//if err := migrate_helper.Up(
+	//	"./infrastructure/migrations/",
+	//	fmt.Sprintf("mysql://%s:%s@tcp(%s:%d)/%s?%s", cfg.Mysql.Username, cfg.Mysql.Password, cfg.Mysql.Host, cfg.Mysql.Port, cfg.Mysql.DbName, cfg.Mysql.Options),
+	//); err != nil {
+	//	if !errors.Is(err, migrate.ErrNoChange) {
+	//		logger.Error("数据库迁移失败: %w", err)
+	//	}
+	//}
 
 	// --- 初始化本地缓存 ---
 	otterCache, err := otter.New(&otter.Options[string, *domain.ShortLink]{

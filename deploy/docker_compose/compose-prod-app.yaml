@@ -1,0 +1,126 @@
+# ---- 迁移 ----
+services:
+  tenant-mysql-migrate:
+    image: migrate/migrate
+    volumes:
+      - ../../internal/migrations/tenant_mysql:/migrations
+    command: [
+      "-path","/migrations",
+      "-database","mysql://user:1234@tcp(mysql-prod:3306)/tenant_prod",
+      "up"
+    ]
+    restart: no
+    networks:
+      - prod-bridge-network
+  link-mysql-migrate:
+    image: migrate/migrate
+    volumes:
+      - ../../internal/migrations/link_mysql:/migrations
+    command: [
+      "-path","/migrations",
+      "-database","mysql://user:1234@tcp(mysql-prod:3306)/link_prod",
+      "up"
+    ]
+    restart: no
+    networks:
+      - prod-bridge-network
+  clickhouse-migrate:
+    image: migrate/migrate
+    volumes:
+      - ../../internal/migrations/clickhouse:/migrations
+    command: [
+      "-path","/migrations",
+      "-database","clickhouse://clickhouse-prod:9000?username=user&password=1234&database=default&x-multi-statement=true",
+      "up"
+    ]
+    restart: no
+    networks:
+      - prod-bridge-network
+
+  # ---- 业务逻辑 ----
+  link-service:
+    build:
+      context: ../../
+      dockerfile: ./internal/link/Dockerfile
+    ports:
+      - "20002:20002"
+      - "20003:20003"
+    depends_on:
+      - link-mysql-migrate
+    restart: unless-stopped
+    volumes:
+      - ../../internal/link/config/config_prod.yaml:/app/config/config.yaml:ro
+      - ../../internal/shared/commonconfig/global_prod.yaml:/app/config/global.yaml:ro
+    environment:
+      - GLOBAL_CONFIG_PATH=./config
+      - SERVICE_CONFIG_PATH=./config
+      - GLOBAL_CONFIG_FILE=config
+      - SERVICE_CONFIG_FILE=global
+    networks:
+      - prod-bridge-network
+  api-gateway:
+    build:
+      context: ../../
+      dockerfile: ./internal/gateway/Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - link-service
+      - tenant-service
+      - analytics-service
+    restart: unless-stopped
+    volumes:
+      - ../../internal/gateway/config/config_prod.yaml:/app/config/config.yaml:ro
+      - ../../internal/shared/commonconfig/global_prod.yaml:/app/config/global.yaml:ro
+    environment:
+      - GLOBAL_CONFIG_PATH=./config
+      - SERVICE_CONFIG_PATH=./config
+      - GLOBAL_CONFIG_FILE=config
+      - SERVICE_CONFIG_FILE=global
+      - GIN_MODE=release
+    networks:
+      - prod-bridge-network
+  analytics-service:
+    build:
+      context: ../../
+      dockerfile: ./internal/analytics/Dockerfile
+    ports:
+      - "40002:40002"
+      - "40003:40003"
+    depends_on:
+      - clickhouse-migrate
+    restart: unless-stopped
+    volumes:
+      - ../../internal/analytics/config/config_prod.yaml:/app/config/config.yaml:ro
+      - ../../internal/shared/commonconfig/global_prod.yaml:/app/config/global.yaml:ro
+    environment:
+      - GLOBAL_CONFIG_PATH=./config
+      - SERVICE_CONFIG_PATH=./config
+      - GLOBAL_CONFIG_FILE=config
+      - SERVICE_CONFIG_FILE=global
+    networks:
+      - prod-bridge-network
+  tenant-service:
+    build:
+      context: ../../
+      dockerfile: ./internal/tenant/Dockerfile
+    ports:
+      - "30002:30002"
+      - "30003:30003"
+    depends_on:
+      - tenant-mysql-migrate
+    restart: unless-stopped
+    volumes:
+      - ../../internal/tenant/config/config_prod.yaml:/app/config/config.yaml:ro
+      - ../../internal/shared/commonconfig/global_prod.yaml:/app/config/global.yaml:ro
+    environment:
+      - GLOBAL_CONFIG_PATH=./config
+      - SERVICE_CONFIG_PATH=./config
+      - GLOBAL_CONFIG_FILE=config
+      - SERVICE_CONFIG_FILE=global
+    networks:
+      - prod-bridge-network
+networks:
+  prod-bridge-network:
+    external: true
+    name: prod-bridge-network

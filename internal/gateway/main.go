@@ -10,7 +10,7 @@ import (
 	"github.com/turbo514/shortenurl-v2/gateway/config"
 	"github.com/turbo514/shortenurl-v2/gateway/router"
 	"github.com/turbo514/shortenurl-v2/shared/client"
-	viper "github.com/turbo514/shortenurl-v2/shared/commonconfig"
+	"github.com/turbo514/shortenurl-v2/shared/commonconfig"
 	"github.com/turbo514/shortenurl-v2/shared/mylog"
 	"github.com/turbo514/shortenurl-v2/shared/rate_limiter"
 	mytrace "github.com/turbo514/shortenurl-v2/shared/trace"
@@ -27,8 +27,9 @@ func main() {
 
 	ctx := context.Background()
 
-	// 读取配置
-	v, err := viper.NewViper("global", "../shared/commonconfig/", "config", "./config/")
+	// --- 读取配置 ---
+	// 默认为本地开发路径
+	v, err := commonconfig.NewViper(commonconfig.GlobalFile, commonconfig.GlobalPath, commonconfig.ServiceFile, commonconfig.ServicePath)
 	if err != nil {
 		logger.Error("读取配置失败", "err", err.Error())
 		return
@@ -48,7 +49,7 @@ func main() {
 
 	// --- 初始化Redis连接 ---
 	redisClient := redis.NewClient(&redis.Options{
-		Addr:         fmt.Sprintf(":%d", cfg.Redis.Port),
+		Addr:         fmt.Sprintf("%s:%d", cfg.Redis.Host, cfg.Redis.Port),
 		PoolSize:     cfg.Redis.PoolSize,
 		MinIdleConns: cfg.Redis.MinIdleConns,
 	})

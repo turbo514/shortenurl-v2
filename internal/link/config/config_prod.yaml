@@ -1,0 +1,10 @@
+prometheus:
+  port: 20003
+  #migrate-file-path:  # 之后再来管这个问题
+service-info:
+  name: shortLink-service
+  version: 1.0.0
+  desc: shortLink-service
+redis:
+  pool-size: 50
+  min-idle-conns: 10

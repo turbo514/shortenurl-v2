@@ -1,0 +1,7 @@
+#migration_file_path: "./migrations/"
+prometheus:
+  port: 30003
+service-info:
+  name: tenant-service
+  version: 1.0.0
+  desc: tenant-service

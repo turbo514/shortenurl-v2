@@ -202,3 +202,15 @@ func ObserveDbDurationSecondsInsert(duration time.Duration) {
 func AddDbOperationsTotalInsert() {
 	metrics.dbOperationsTotal.WithLabelValues(insert).Inc()
 }
+
+const (
+	click  = "click"
+	create = "create"
+)
+
+func ObserveMqPublishDurationSecondsClick(duration time.Duration) {
+	metrics.mqPublishDurationSeconds.WithLabelValues(click).Observe(duration.Seconds())
+}
+func ObserveMqPublishDurationSecondsCreate(duration time.Duration) {
+	metrics.mqPublishDurationSeconds.WithLabelValues(create).Observe(duration.Seconds())
+}

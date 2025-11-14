@@ -1,5 +1,33 @@
 package commonconfig
 
+import "os"
+
+var (
+	GlobalPath  string
+	GlobalFile  string
+	ServicePath string
+	ServiceFile string
+)
+
+func init() {
+	GlobalPath = os.Getenv("GLOBAL_CONFIG_PATH")
+	if GlobalPath == "" {
+		GlobalPath = "../shared/commonconfig/"
+	}
+	GlobalFile = os.Getenv("GLOBAL_CONFIG_FILE")
+	if GlobalFile == "" {
+		GlobalFile = "global_dev"
+	}
+	ServicePath = os.Getenv("SERVICE_CONFIG_PATH")
+	if ServicePath == "" {
+		ServicePath = "./config/"
+	}
+	ServiceFile = os.Getenv("SERVICE_CONFIG_FILE")
+	if ServiceFile == "" {
+		ServiceFile = "config_dev"
+	}
+}
+
 type RabbitMqConfig struct {
 	Host     string `mapstructure:"host"`
 	Port     int    `mapstructure:"port"`

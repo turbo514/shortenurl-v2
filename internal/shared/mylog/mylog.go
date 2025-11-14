@@ -8,9 +8,27 @@ import (
 	"os"
 )
 
+var logLevel slog.Level
+
+func init() {
+	LogLevel := os.Getenv("LOG_LEVEL")
+	switch LogLevel {
+	case "debug":
+		logLevel = slog.LevelDebug
+	case "info":
+		logLevel = slog.LevelInfo
+	case "warn":
+		logLevel = slog.LevelWarn
+	case "error":
+		logLevel = slog.LevelError
+	default:
+		logLevel = slog.LevelInfo
+	}
+}
+
 // 设置基础日志器，使用文本格式输出到 os.Stderr
 var logger = slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
-	Level: slog.LevelDebug,
+	Level: logLevel,
 }))
 
 func GetLogger() *slog.Logger {
