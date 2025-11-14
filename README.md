@@ -1,78 +1,124 @@
-# shortenurl-v2
+# 项目简介
+这是一个 SaaS 多租户短链接平台。每个租户可创建和管理短链接，终端用户点击短链接后系统会进行 跳转、限流、事件上报、监控日志记录 等操作
+该项目用于学习微服务、Golang、高并发、缓存策略等相关技术
 
-# 开发用:
-1. 流程解释:
-存在api-gateway
-存在三个微服务,链接处理微服务,租户处理微服务,数据分析微服务
+# 功能特性
+- 多租户管理：独立空间、独立短链、独立统计数据
+- 短链生成 & 跳转服务
+- 访问日志 & 点击事件上报
+- Redis 缓存加速 / 缓存穿透保护
+- 本地缓存加速
+- Prometheus + Grafana 指标监控
+- OpenTelemetry 分布式追踪
+- 数据库迁移工具
+- Redis实现令牌桶算法分布式限流
+- cqrs
+- clean architecture
 
-api-gateway接受http请求，然后根据请求类型，使用grpc调用三个下游服务
+# 技术栈
+## Backend
+- Golang（Gin / gRPC）
+- GORM
+- Viper
 
-链接处理下游服务负责生成短链接或还原短链接。它会与redis和数据库交互，将结果发回给api-gateway，并往消息队列里记录这次点击事件
+## Infra
+- Redis
+- MySQL
+- RabbitMQ
+- Clickhouse
 
-租户处理下游服务负责处理租户添加和租户查询,租户修改
+## DevOps
+- Docker & Docker Compose
+- Makefile
+- golang-migrate
 
-数据分析下游服务负责数据采集和数据查询。它会监听消息队列以采集数据，并将数据写入数据库(如点击量等等)。它也会与redis和数据库交互，提供数据查询功能
+## Observability
+- Prometheus
+- OpenTelemetry + Jaeger
 
----
+# 性能表现
 
-## 链接处理
+可以做到600qps
 
-链接处理服务会有大量读请求(还原链接请求),而且读写比十分悬殊
+由于是本机测试,应该有一定误差
+一大部分性能损耗来自消息队列和序列化
 
-需要做好缓存服务
+几乎全部命中缓存
 
-### 性能
+# 快速开始
+```bash
+git clone https://github.com/turbo514/shortenurl-v2.git
 
-多级缓存
+cd shortenurl-v2
 
-### 安全性
+make prod-infra-up
 
-缓存穿透:
-缓存雪崩:
-缓存击穿:
+make prod-app-up
+```
 
-### 整个流程
+```bash
+# 创建租户
+curl -X POST "http://localhost:8080/tenants" \
+    -H "Content-Type: application/json" \
+    -d '{"name":"张三"}'
 
-生成短链接是根据原链接生成短链接
-TODO: 批量生成
-**算法(暂定):**
->不允许过期链接复用,该删就删
-1. 生成字符串,格式:"租户id:长链接"
-2. 用murmurhash哈希算法进行哈希,并用base62算法进行转换得到短链接
-3. 若该租户下已有该短链接,则重新生成字符串,格式:"租户id:长连接:随机字符串(8)",然后重复过程
+# 创建用户
+curl -X POST "http://localhost:8080/users" \
+  -H "Content-Type: application/json" \
+  -d '{
+        "name":"张三",
+        "tenant_id":"019a829b-2231-7740-ba47-243aca9eadeb",
+        "api_key":"74bf9cf5-c310-4a48-b904-06cc4357c933",
+        "password":"123456"
+      }'
 
-还原链接是从数据库或者缓存里拿
+# 用户登录
+curl -X POST "http://localhost:8080/sessions" \
+  -H "Content-Type: application/json" \
+  -d '{
+        "name": "张三",
+        "tenant_id": "019a829b-2231-7740-ba47-243aca9eadeb",
+        "password": "123456"
+      }'
 
-生成短链接时需要往消息队列发消息,保证数据分析的库的维度表里有链接的信息.这样链接过期删除之后还能保有相关信息,而且在同一个数据库里.
-还原短链接时需要发点击记录消息,供数据分析服务进行分析和记录.
-> CDC暂时使用rabbitmq,日后再改成kafka,或者用更加正统的CDC
+# 创建短链
+curl -X POST "http://localhost:8080/shortlinks" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJNIjp7InRlbmFudF9pZCI6IjAxOWE4MjliLTIyMzEtNzc0MC1iYTQ3LTI0M2FjYTllYWRlYiIsInVzZXJfaWQiOiIwMTlhODI5Yy02YjNlLTc1NzYtOTY3ZC0zMDIwMmZlMGU1MmQifSwiaXNzIjoiVGVuYW50IFNlcnZpY2UiLCJleHAiOjE3NjM3MzI3MTR9.kdsez_ECfgu_gNjFDM2XeM0GuNA1_G9qPn3nc4q54JQ" \
+  -d '{
+        "original_url": "www.baidu.com",
+        "expiration": 3600
+      }'
 
-## 数据分析服务
+# 短链解析和跳转
+curl -X GET "http://localhost:8080/resolve/6tSb4nAJRB4"
 
-> 暂时使用mysql,日后应该改成OLAP数据库,例如click house
+# 查看今日排行榜
+curl -X GET "localhost:8080/ranking/today?num=100" \
+    -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJNIjp7InRlbmFudF9pZCI6IjAxOWE4MjliLTIyMzEtNzc0MC1iYTQ3LTI0M2FjYTllYWRlYiIsInVzZXJfaWQiOiIwMTlhODI5Yy02YjNlLTc1NzYtOTY3ZC0zMDIwMmZlMGU1MmQifSwiaXNzIjoiVGVuYW50IFNlcnZpY2UiLCJleHAiOjE3NjM3MzI3MTR9.kdsez_ECfgu_gNjFDM2XeM0GuNA1_G9qPn3nc4q54JQ"
+```
 
-定期从创建链接队列**拉取**消息,并写入维度表.
-拉取是为了性能
+```bash
+输入ctrl+C关闭,或者输入`make prod-app-down`和`make prod-infra-down`关闭
+```
 
-点击事件的获取采取**推送**方式,分析数据,并将相关内容写入事实表里
-> 暂且不分析,直接写入user-agent
+# 架构介绍
+客户端 -> api-gateway
 
-查询则是从redis或者数据库拿
+api-gateway -> tenant service
 
-对于点击量这样的数据,只放在redis里.通过后台协程将用不到的写到数据库里?ClickHouse好像很擅长这种东西
-或者定期写入数据库?但是可能丢失
-批量ack?
+api-gateway -> link service -> rabbimq,mysql
 
-### 幂等性
+rabbitmq -> analytics service -> clickhouse
 
-链接处理服务给点击事件加上唯一标识码(uuidv7)
+api-gateway -> analytics service
 
-通过redis和唯一键(?可能拖累性能)来实现幂等性
+# TODO
+## 功能
+- [ ] 批量创建短链
+- [ ] 增加一些确实的分析服务?
 
-## api-gateway
-
-速率限制
-请求校验
-
-## 可观测性
-
+## 性能
+- [ ] 更换消息队列为Kafka
+- [ ] 将统计服务channel更换为spsc无锁队列提升性能
+- [ ] 提升承载能力

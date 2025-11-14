@@ -214,3 +214,10 @@ func ObserveMqPublishDurationSecondsClick(duration time.Duration) {
 func ObserveMqPublishDurationSecondsCreate(duration time.Duration) {
 	metrics.mqPublishDurationSeconds.WithLabelValues(create).Observe(duration.Seconds())
 }
+
+func AddMqPublishTotalClickSuccess() {
+	metrics.mqPublishTotal.WithLabelValues(click, "success").Inc()
+}
+func AddMqPublishTotalClickFailed() {
+	metrics.mqPublishTotal.WithLabelValues(click, "failed").Inc()
+}

@@ -9,7 +9,7 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./dbinit/dev/mysql_init.sql:/docker-entrypoint-initdb.d/init.sql
   redis-dev:
     image: redis:8
     restart: on-failure
@@ -40,6 +40,8 @@ services:
       - "8123:8123"
       - "9000:9000"
       - "9009:9009"
+    volumes:
+      - ./dbinit/dev/clickhouse_init.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
       - CLICKHOUSE_USER=user
       - CLICKHOUSE_PASSWORD=1234

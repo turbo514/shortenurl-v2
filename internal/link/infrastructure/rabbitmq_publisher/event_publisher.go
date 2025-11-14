@@ -6,9 +6,11 @@ import (
 	"fmt"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/turbo514/shortenurl-v2/link/adapter"
+	"github.com/turbo514/shortenurl-v2/link/metrics"
 	"github.com/turbo514/shortenurl-v2/shared/dto"
 	"github.com/turbo514/shortenurl-v2/shared/rabbitmq"
 	mytrace "github.com/turbo514/shortenurl-v2/shared/trace"
+	"time"
 )
 
 var _ adapter.IEventPublisher = (*EventPublisher)(nil)
@@ -71,15 +73,21 @@ func (e *EventPublisher) PublishClickEvent(ctx context.Context, event dto.ClickE
 		return fmt.Errorf("json序列化失败: %w", err)
 	}
 
+	start := time.Now()
 	err = channel.PublishWithContext(ctx, rabbitmq.ClickEventExchange, rabbitmq.ClickLink, false, false, amqp.Publishing{
 		DeliveryMode: amqp.Persistent,
 		ContentType:  "application/json",
 		Body:         body,
 	})
+	end := time.Now()
+	metrics.ObserveMqPublishDurationSecondsClick(end.Sub(start))
+
 	if err != nil {
+		metrics.AddMqPublishTotalClickFailed()
 		return fmt.Errorf("发送到消息队列失败: %w", err)
 	}
 
+	metrics.AddMqPublishTotalClickSuccess()
 	return nil
 }
 
