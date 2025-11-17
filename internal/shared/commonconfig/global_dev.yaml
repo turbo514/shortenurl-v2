@@ -1,8 +1,5 @@
-rabbitmq:
-  host: 127.0.0.1
-  port: 5672
-  username: guest
-  password: guest
+kafka:
+  seed-brokers: 127.0.0.1:9092
 redis:
   host: 127.0.0.1
   port: 6379
@@ -29,6 +26,7 @@ analytics-clickhouse:
   username: user
   password: 1234
   dbname: default
+  debug: false
 link-service:
   host: 127.0.0.1
   port: 20002

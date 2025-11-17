@@ -20,7 +20,6 @@ const (
 	CreateLink string = "shortlink.create"
 )
 
-// 点击事件交换机
 func InitClickEventExchange(channel *amqp091.Channel) error {
 	if err := channel.ExchangeDeclare(ClickEventExchange, "topic", true, false, false, false, nil); err != nil {
 		return fmt.Errorf("初始化ClickEventExchange失败: %w", err)

@@ -18,6 +18,7 @@ import (
 	"golang.org/x/time/rate"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	_ "net/http/pprof"
 	"syscall"
 )
 
@@ -26,7 +27,7 @@ func main() {
 	logger := mylog.GetLogger()
 
 	ctx := context.Background()
-
+	gin.SetMode(gin.ReleaseMode)
 	// --- 读取配置 ---
 	// 默认为本地开发路径
 	v, err := commonconfig.NewViper(commonconfig.GlobalFile, commonconfig.GlobalPath, commonconfig.ServiceFile, commonconfig.ServicePath)

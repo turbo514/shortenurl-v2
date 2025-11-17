@@ -8,7 +8,6 @@ import (
 	"github.com/oklog/run"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/rabbitmq/amqp091-go"
 	"github.com/redis/go-redis/v9"
 	"github.com/turbo514/shortenurl-v2/analytics/config"
 	"github.com/turbo514/shortenurl-v2/analytics/controller"
@@ -16,13 +15,13 @@ import (
 	"github.com/turbo514/shortenurl-v2/analytics/cqrs/query"
 	"github.com/turbo514/shortenurl-v2/analytics/infra"
 	"github.com/turbo514/shortenurl-v2/analytics/service"
-	"github.com/turbo514/shortenurl-v2/analytics/util"
 	"github.com/turbo514/shortenurl-v2/shared/commonconfig"
 	analyticspb "github.com/turbo514/shortenurl-v2/shared/gen/proto/analytics"
+	"github.com/turbo514/shortenurl-v2/shared/keys"
 	"github.com/turbo514/shortenurl-v2/shared/mylog"
 	myprom "github.com/turbo514/shortenurl-v2/shared/prom"
-	"github.com/turbo514/shortenurl-v2/shared/rabbitmq"
 	mytrace "github.com/turbo514/shortenurl-v2/shared/trace"
+	"github.com/twmb/franz-go/pkg/kgo"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
 	"gorm.io/driver/mysql"
@@ -85,9 +84,9 @@ func main() {
 			Username: cfg.Clickhouse.Username,
 			Password: cfg.Clickhouse.Password,
 		},
-		Debug: true,
+		Debug: cfg.Clickhouse.Debug,
 		Debugf: func(format string, v ...any) {
-			logger.Info(fmt.Sprintf(format, v...))
+			logger.Debug(fmt.Sprintf(format, v...))
 		},
 		TLS: nil,
 	})
@@ -129,18 +128,18 @@ func main() {
 		return
 	}
 
-	// --- 消息队列 RabbitMq 初始化 ---
-	amqpConn, err := amqp091.Dial(fmt.Sprintf("amqp://%s:%s@%s:%d", cfg.RabbitMq.Username, cfg.RabbitMq.Password, cfg.RabbitMq.Host, cfg.RabbitMq.Port))
-	if err != nil {
-		logger.Error("链接消息队列失败", "err", err.Error())
-		return
-	}
-	defer amqpConn.Close()
-	// --- 队列初始化 ---
-	if err := util.InitQueue(amqpConn); err != nil {
-		logger.Error("初始化消息队列失败", "err", err.Error())
-		return
-	}
+	//// --- 消息队列 RabbitMq 初始化 ---
+	//amqpConn, err := amqp091.Dial(fmt.Sprintf("amqp://%s:%s@%s:%d", cfg.RabbitMq.Username, cfg.RabbitMq.Password, cfg.RabbitMq.Host, cfg.RabbitMq.Port))
+	//if err != nil {
+	//	logger.Error("链接消息队列失败", "err", err.Error())
+	//	return
+	//}
+	//defer amqpConn.Close()
+	//// --- 队列初始化 ---
+	//if err := util.InitQueue(amqpConn); err != nil {
+	//	logger.Error("初始化消息队列失败", "err", err.Error())
+	//	return
+	//}
 
 	// --- Database层初始化 ---
 	clickhouseDb := infra.NewClickhouseDb(clickhouseConn)
@@ -156,32 +155,44 @@ func main() {
 	g := &run.Group{}
 
 	// 1. 监听链接点击事件
-	clickEventReceiver := infra.NewRabbitMqClickEventReceiver(amqpConn, rabbitmq.ClickEventQueue)
-	clickEventCh := clickEventReceiver.GetChannel()
-	g.Add(func() error {
-		logger.Info("正在监听点击事件")
-		if err := clickEventReceiver.Start(); err != nil {
-			logger.Error("监听链接点击事件失败", "err", err.Error())
-			return err
-		}
-		return nil
-	}, func(err error) {
-		clickEventReceiver.Close()
-		logger.Info("已停止监听点击事件")
-	})
+	{
+		ctx, cancel := context.WithCancel(ctx)
+		defer cancel()
+		g.Add(func() error {
+			logger.Info("正在监听点击事件")
+			receiver := infra.NewKafkaClickEventReceiver(createClickEventHandler)
 
-	// 2. 处理链接点击事件
-	clickEventHandler := controller.NewClickEventHandler(clickEventCh, 2048, createClickEventHandler)
-	g.Add(func() error {
-		logger.Info("正在处理点解事件")
-		if err := clickEventHandler.Start(); err != nil {
-			logger.Error("处理链接点击事件失败", "err", err.Error())
-		}
-		return nil
-	}, func(err error) {
-		clickEventHandler.Close()
-		logger.Info("已停止处理点击事件")
-	})
+			opts := []kgo.Opt{
+				kgo.SeedBrokers(cfg.Kafka.SeedBrokers...),                                // broker 列表
+				kgo.ConsumerGroup(keys.ClickConsumerGroup + "-" + keys.KafkaGroupSuffix), // consumer group
+				kgo.ConsumeTopics(keys.ClickEventTopic),                                  // topic
+				kgo.OnPartitionsAssigned(receiver.Assigned),                              // 分区分配回调
+				kgo.OnPartitionsRevoked(receiver.Lost),                                   // 分区撤销回调
+				kgo.OnPartitionsLost(receiver.Lost),                                      // 分区丢失回调
+				kgo.DisableAutoCommit(),                                                  // 禁用自动提交
+				kgo.BlockRebalanceOnPoll(),                                               // 阻塞 rebalance，保证分区消费者安全
+			}
+			cl, err := kgo.NewClient(opts...)
+			if err != nil {
+				logger.Error("建立连接失败", "err", err.Error())
+				return err
+			}
+			if err := cl.Ping(ctx); err != nil {
+				logger.Error("Ping 消息队列失败", "err", err.Error())
+				return err
+			}
+			defer cl.Close()
+
+			logger.Info("开始监听点击事件")
+			receiver.Poll(ctx, 10000, cl) // 可能写死不是个好主意
+
+			return nil
+		}, func(err error) {
+			cancel()
+			logger.Info("已停止监听点击事件")
+		})
+	}
+	// 2. 监听链接创建事件
 
 	// 3. prometheus拉取用的http指标服务器
 	httpSrv := http.Server{
@@ -247,7 +258,7 @@ func main() {
 
 	// 运行所有服务
 	if err := g.Run(); err != nil {
-		logger.Error("程序报错", "err", err.Error())
+		logger.Error("程序退出", "err", err.Error())
 		return
 	}
 }

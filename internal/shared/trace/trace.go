@@ -22,6 +22,26 @@ func GetTracer() trace.Tracer {
 	return otel.Tracer(serviceName)
 }
 
+//type MySampler struct{}
+//
+//func (MySampler) ShouldSample(p sdktrace.SamplingParameters) sdktrace.SamplingResult {
+//	if rand.Float64() < 0.1 {
+//		return sdktrace.SamplingResult{
+//			Decision:   sdktrace.RecordAndSample,
+//			Tracestate: trace.SpanContextFromContext(p.ParentContext).TraceState(),
+//		}
+//	} else {
+//		return sdktrace.SamplingResult{
+//			Decision:   sdktrace.Drop,
+//			Tracestate: trace.SpanContextFromContext(p.ParentContext).TraceState(),
+//		}
+//	}
+//}
+//
+//func (MySampler) Description() string {
+//	return "MySampler"
+//}
+
 func InitOpenTelemetry(ctx context.Context, jaegerConfig *commonconfig.JaegerConfig, serviceInfo *commonconfig.ServiceInfo) (*sdktrace.TracerProvider, error) {
 	// 1. 配置 OTLP Exporter 连接到 Jaeger OTLP 端口
 	conn, err := grpc.NewClient(
@@ -54,9 +74,9 @@ func InitOpenTelemetry(ctx context.Context, jaegerConfig *commonconfig.JaegerCon
 
 	// 4. 创建 TracerProvider
 	tp := sdktrace.NewTracerProvider(
-		sdktrace.WithBatcher(exporter),                // 批量发送数据
-		sdktrace.WithResource(res),                    // 关联资源属性
-		sdktrace.WithSampler(sdktrace.AlwaysSample()), // 采样策略
+		sdktrace.WithBatcher(exporter), // 批量发送数据
+		sdktrace.WithResource(res),     // 关联资源属性
+		sdktrace.WithSampler(sdktrace.ParentBased(sdktrace.TraceIDRatioBased(0.05))), // 采样策略
 	)
 
 	// 5. 将 TracerProvider 注册为全局默认提供者

@@ -22,14 +22,21 @@ func init() {
 	case "error":
 		logLevel = slog.LevelError
 	default:
-		logLevel = slog.LevelInfo
+		logLevel = slog.LevelDebug
 	}
+	logger = slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
+		Level: logLevel,
+	}))
 }
 
 // 设置基础日志器，使用文本格式输出到 os.Stderr
-var logger = slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
-	Level: logLevel,
-}))
+var logger *slog.Logger
+
+func SetLogLevel(level slog.Level) {
+	logger = slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
+		Level: level,
+	}))
+}
 
 func GetLogger() *slog.Logger {
 	return logger

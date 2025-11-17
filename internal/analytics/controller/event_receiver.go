@@ -5,16 +5,12 @@ import (
 	"github.com/turbo514/shortenurl-v2/analytics/domain"
 )
 
-type IEventReceiver[EventType any] interface {
-	StartAConsumer(ctx context.Context) (<-chan EventType, error)
-}
-
 type IAcker interface {
-	Ack() error
-	Nack() error
+	Ack(ctx context.Context) error
+	Nack(ctx context.Context) error
 }
 
 type ClickEventWithAcker struct {
-	Event *domain.ClickEvent
+	Event []*domain.ClickEvent
 	Acker IAcker
 }

@@ -10,18 +10,18 @@ import (
 	"github.com/oklog/run" // 用于管理多个 Goroutine 任务（如 gRPC server, HTTP server）
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/rabbitmq/amqp091-go"
 	"github.com/redis/go-redis/extra/redisotel/v9"
 	"github.com/redis/go-redis/v9"
 	"github.com/turbo514/shortenurl-v2/link/config"
 	"github.com/turbo514/shortenurl-v2/link/domain"
+	"github.com/turbo514/shortenurl-v2/link/infrastructure/kafka_publisher"
 	otterrepo "github.com/turbo514/shortenurl-v2/link/infrastructure/otter_repository"
-	"github.com/turbo514/shortenurl-v2/link/infrastructure/rabbitmq_publisher"
 	redisrepo "github.com/turbo514/shortenurl-v2/link/infrastructure/redis_repository"
 	"github.com/turbo514/shortenurl-v2/link/metrics"
 	"github.com/turbo514/shortenurl-v2/shared/mylog"
 	myprom "github.com/turbo514/shortenurl-v2/shared/prom"
 	mytrace "github.com/turbo514/shortenurl-v2/shared/trace"
+	"github.com/twmb/franz-go/pkg/kgo"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"net/http"
 	"syscall"
@@ -34,11 +34,19 @@ import (
 	"github.com/turbo514/shortenurl-v2/shared/commonconfig"
 	linkpb "github.com/turbo514/shortenurl-v2/shared/gen/proto/link"
 	"google.golang.org/grpc"
-
 	"net"
 )
 
+//func init() {
+//	go func() {
+//		http.ListenAndServe("0.0.0.0:6060", nil)
+//	}()
+//}
+
 func main() {
+	//go func() {
+	//	http.ListenAndServe("0.0.0.0:6060", nil)
+	//}()
 	// --- 日志设置 (slog) ---
 	logger := mylog.GetLogger()
 	// 针对 RPC 请求创建带默认字段的日志器
@@ -142,20 +150,32 @@ func main() {
 	redisRepo := redisrepo.NewRedisCacheRepository(redisClient, mysqlRepo)
 	otterRepo := otterrepo.NewOtterCacheRepository(otterCache, redisRepo)
 
-	// --- 初始化RabbitMQ消息队列 ---
-	amqpconn, err := amqp091.Dial(fmt.Sprintf("amqp://%s:%s@%s:%d", cfg.RabbitMq.Username, cfg.RabbitMq.Password, cfg.RabbitMq.Host, cfg.RabbitMq.Port))
+	//// --- 初始化RabbitMQ消息队列 ---
+	//amqpconn, err := amqp091.Dial(fmt.Sprintf("amqp://%s:%s@%s:%d", cfg.RabbitMq.Username, cfg.RabbitMq.Password, cfg.RabbitMq.Host, cfg.RabbitMq.Port))
+	//if err != nil {
+	//	logger.Error("连接消息队列失败", "err", err.Error())
+	//	return
+	//}
+	//defer amqpconn.Close()
+
+	// --- 初始化Kafka连接 ---
+	kafkaOpt := []kgo.Opt{
+		kgo.SeedBrokers(cfg.Kafka.SeedBrokers...), // broker 列表
+		kgo.BlockRebalanceOnPoll(),
+	}
+	kafkaConn, err := kgo.NewClient(kafkaOpt...)
 	if err != nil {
-		logger.Error("连接消息队列失败", "err", err.Error())
+		logger.Error("初始化消息队列连接失败", "err", err.Error())
 		return
 	}
-	defer amqpconn.Close()
+	defer kafkaConn.Close()
+	if err := kafkaConn.Ping(ctx); err != nil {
+		logger.Error("Ping 消息失败", "err", err.Error())
+		return
+	}
 
 	// --- 初始化事件发送器 ---
-	publisher := rabbitmq_publisher.NewEventPublisher(amqpconn)
-	if err := publisher.Init(); err != nil {
-		logger.Error("初始化消息队列失败", "err", err.Error())
-		return
-	}
+	publisher := kafka_publisher.NewKafkaEventPublisher(kafkaConn)
 
 	// --- 初始化服务逻辑 ---
 	service := usecase.NewLinkUseCase(otterRepo, publisher)

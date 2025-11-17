@@ -1,6 +1,5 @@
 FROM golang:latest AS builder
 LABEL org.opencontainers.image.author="turbo514"
-LABEL org.opencontainers.image.created="2025.11.13.v1"
 
 WORKDIR /build/link
 

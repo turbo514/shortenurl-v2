@@ -211,6 +211,10 @@ const (
 func ObserveMqPublishDurationSecondsClick(duration time.Duration) {
 	metrics.mqPublishDurationSeconds.WithLabelValues(click).Observe(duration.Seconds())
 }
+func ObserveMqPublishDurationSecondsClickAll(duration time.Duration) {
+	metrics.mqPublishDurationSeconds.WithLabelValues("click-all").Observe(duration.Seconds())
+}
+
 func ObserveMqPublishDurationSecondsCreate(duration time.Duration) {
 	metrics.mqPublishDurationSeconds.WithLabelValues(create).Observe(duration.Seconds())
 }

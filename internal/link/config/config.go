@@ -11,7 +11,7 @@ type Config struct {
 	Mysql       commonconfig.LinkMysqlConfig   `mapstructure:"link-mysql"`
 	Jaeger      commonconfig.JaegerConfig      `mapstructure:"jaeger"`
 	Redis       commonconfig.RedisConfig       `mapstructure:"redis"`
-	RabbitMq    commonconfig.RabbitMqConfig    `mapstructure:"rabbitmq"`
+	Kafka       commonconfig.KafkaConfig       `mapstructure:"kafka"`
 	Prometheus  commonconfig.PrometheusConfig  `mapstructure:"prometheus"`
 	Server      commonconfig.LinkServiceConfig `mapstructure:"link-service"`
 }

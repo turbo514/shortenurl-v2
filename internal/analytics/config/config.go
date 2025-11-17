@@ -7,14 +7,14 @@ import (
 )
 
 type Config struct {
-	Prometheus  commonconfig.PrometheusConfig          `mapstructure:"prometheus"`
-	Redis       commonconfig.RedisConfig               `mapstructure:"redis"`
-	RabbitMq    commonconfig.RabbitMqConfig            `mapstructure:"rabbitmq"`
-	Server      commonconfig.AnalyticsServiceConfig    `mapstructure:"analytics-service"`
-	Clickhouse  commonconfig.AnalyticsClickHouseConfig `mapstructure:"analytics-clickhouse"`
-	Mysql       commonconfig.LinkMysqlConfig           `mapstructure:"link-mysql"`
-	ServiceInfo commonconfig.ServiceInfo               `mapstructure:"service-info"`
-	Jaeger      commonconfig.JaegerConfig              `mapstructure:"jaeger"`
+	Prometheus  commonconfig.PrometheusConfig       `mapstructure:"prometheus"`
+	Redis       commonconfig.RedisConfig            `mapstructure:"redis"`
+	Kafka       commonconfig.KafkaConfig            `mapstructure:"kafka"`
+	Server      commonconfig.AnalyticsServiceConfig `mapstructure:"analytics-service"`
+	Clickhouse  commonconfig.ClickHouseConfig       `mapstructure:"analytics-clickhouse"`
+	Mysql       commonconfig.LinkMysqlConfig        `mapstructure:"link-mysql"`
+	ServiceInfo commonconfig.ServiceInfo            `mapstructure:"service-info"`
+	Jaeger      commonconfig.JaegerConfig           `mapstructure:"jaeger"`
 }
 
 func NewConfig(v *viper.Viper) (*Config, error) {

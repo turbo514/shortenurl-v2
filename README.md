@@ -38,7 +38,7 @@
 
 # 性能表现
 
-可以做到600qps
+可以做到2700qps
 
 由于是本机测试,应该有一定误差
 一大部分性能损耗来自消息队列和序列化
@@ -52,6 +52,8 @@ git clone https://github.com/turbo514/shortenurl-v2.git
 cd shortenurl-v2
 
 make prod-infra-up
+
+make kafka-init
 
 make prod-app-up
 ```

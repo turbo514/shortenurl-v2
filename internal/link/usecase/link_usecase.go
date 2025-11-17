@@ -61,6 +61,7 @@ func (uc *LinkUseCase) Resolve(ctx context.Context, req ResolveRequest) (string,
 		UserAgent: req.UserAgent,
 		Referrer:  req.Referrer,
 	}
+	//mylog.GetLogger().Debug("发送事件", "event", clickEvent)
 	if err := uc.publisher.PublishClickEvent(ctx, clickEvent); err != nil {
 		// TODO: 收件箱模式
 		// TODO: 异步发送+连接池

@@ -19,14 +19,6 @@ services:
       - "6379:6379"
     networks:
       - prod-net
-  rabbitmq-prod:
-    image: rabbitmq:4-management
-    restart: on-failure
-    ports:
-      - "5672:5672"
-      -  "15672:15672"
-    networks:
-      - prod-net
   jaeger-prod:
     image: jaegertracing/jaeger
     restart: on-failure
@@ -36,8 +28,6 @@ services:
       - "4318:4318"
     networks:
       - prod-net
-    environment:
-      - LOG_LEVEL=debug
   clickhouse-prod:
     image: clickhouse:latest
     ulimits:
@@ -55,7 +45,41 @@ services:
       - CLICKHOUSE_PASSWORD=1234
     volumes:
       - ./dbinit/prod/clickhouse_init.sql:/docker-entrypoint-initdb.d/init.sql
+  kafka-prod:
+    image: apache/kafka:latest
+    ports:
+      - "9092:9092"
+    restart: on-failure
+    networks:
+      - prod-net
+    volumes:
+      - ./kafka/create-topics.sh:/opt/kafka/create-topics.sh
+    environment:
+      # --- 关键 KRaft 配置 ---
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller # 一体化模式
+      KAFKA_LISTENERS: INTERNAL://:29092,EXTERNAL://:9092,CONTROLLER://:9093
 
+      # 告诉内部服务使用 kafka-prod:29092 (服务名)
+      # 告诉外部（宿主机）使用 localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-prod:29092,EXTERNAL://localhost:9092
+
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+
+      # Controller 仲裁配置 (单节点)
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+
+      # 指定 Broker 间通信使用的监听器
+      # 必须指向 KAFKA_LISTENERS 中已定义的名称 (INTERNAL)
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+
+      # --- 其他开发配置 ---
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_NUM_PARTITIONS: 3
 networks:
   prod-net:
     driver: bridge

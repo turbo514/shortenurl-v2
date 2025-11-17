@@ -60,14 +60,18 @@ type LinkMysqlConfig struct {
 	Options  string `mapstructure:"options"`
 }
 
-type AnalyticsClickHouseConfig struct {
+type ClickHouseConfig struct {
 	Host     string `mapstructure:"host"`
 	Port     int    `mapstructure:"port"`
 	Username string `mapstructure:"username"`
 	Password string `mapstructure:"password"`
 	DbName   string `mapstructure:"dbname"`
+	Debug    bool   `mapstructure:"debug"`
 }
 
+type GinConfig struct {
+}
+type TraceConfig struct{}
 type ApiGatewayConfig struct {
 	Port int `mapstructure:"port"`
 }
@@ -103,4 +107,10 @@ type PrometheusConfig struct {
 type RateLimiterConfig struct {
 	Capacity int64   `mapstructure:"capacity"`
 	Rate     float64 `mapstructure:"rate"`
+}
+
+type KafkaConfig struct {
+	SeedBrokers    []string `mapstructure:"seed-brokers"`
+	ConsumerGourp  string   `mapstructure:"consumer-gourp"`
+	ConsumerTopics []string `mapstructure:"consumer-topics"`
 }

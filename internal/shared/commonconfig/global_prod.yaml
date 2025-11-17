@@ -1,8 +1,5 @@
-rabbitmq:
-  host: rabbitmq-prod
-  port: 5672
-  username: guest
-  password: guest
+kafka:
+  seed-brokers: kafka-prod:29092
 redis:
   host: redis-prod
   port: 6379
