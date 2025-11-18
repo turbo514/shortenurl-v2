@@ -22,7 +22,7 @@ func init() {
 	case "error":
 		logLevel = slog.LevelError
 	default:
-		logLevel = slog.LevelDebug
+		logLevel = slog.LevelInfo
 	}
 	logger = slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
 		Level: logLevel,

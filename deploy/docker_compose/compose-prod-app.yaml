@@ -74,6 +74,8 @@ services:
     volumes:
       - ../../internal/gateway/config/config_prod.yaml:/app/config/config.yaml:ro
       - ../../internal/shared/commonconfig/global_prod.yaml:/app/config/global.yaml:ro
+      - ../../internal/gateway/config/certs/server.crt:/app/config/certs/server.crt:ro
+      - ../../internal/gateway/config/certs/server.key:/app/config/certs/server.key:ro
     environment:
       - GLOBAL_CONFIG_PATH=./config
       - SERVICE_CONFIG_PATH=./config

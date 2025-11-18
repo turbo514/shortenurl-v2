@@ -63,8 +63,8 @@ func ResolveLink(app *appcontext.AppContext) gin.HandlerFunc {
 		}
 
 		// 响应用户请求,进行跳转
-		//c.Redirect(http.StatusTemporaryRedirect, "https://"+resp.OriginalUrl)
-		c.Header("Location", "https://"+resp.OriginalUrl)
-		c.JSON(http.StatusOK, gin.H{})
+		c.Redirect(http.StatusTemporaryRedirect, "https://"+resp.OriginalUrl)
+		//c.Header("Location", "https://"+resp.OriginalUrl)
+		//c.JSON(http.StatusOK, gin.H{})
 	}
 }

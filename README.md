@@ -60,44 +60,27 @@ make prod-app-up
 
 ```bash
 # 创建租户
-curl -X POST "http://localhost:8080/tenants" \
-    -H "Content-Type: application/json" \
-    -d '{"name":"张三"}'
+https POST "https://localhost:8080/tenants" name="张三的公司" --verify n
 
 # 创建用户
-curl -X POST "http://localhost:8080/users" \
-  -H "Content-Type: application/json" \
-  -d '{
-        "name":"张三",
-        "tenant_id":"019a829b-2231-7740-ba47-243aca9eadeb",
-        "api_key":"74bf9cf5-c310-4a48-b904-06cc4357c933",
-        "password":"123456"
-      }'
+https POST "https://localhost:8080/users" name="张三" tenant_id="019a91a2-57e9-735f-aa27-ec028ec57bb5" api_key="07e50f06-338e-  1f-8ee4-a5f38fad82e9" password="123456" --json --verify no
 
 # 用户登录
-curl -X POST "http://localhost:8080/sessions" \
-  -H "Content-Type: application/json" \
-  -d '{
-        "name": "张三",
-        "tenant_id": "019a829b-2231-7740-ba47-243aca9eadeb",
-        "password": "123456"
-      }'
+https POST "https://localhost:8080/sessions" name="张三" tenant_id="019a91a2-57e9-735f-aa27-ec028ec57bb5" password="123456" --json --verify no
 
 # 创建短链
-curl -X POST "http://localhost:8080/shortlinks" \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJNIjp7InRlbmFudF9pZCI6IjAxOWE4MjliLTIyMzEtNzc0MC1iYTQ3LTI0M2FjYTllYWRlYiIsInVzZXJfaWQiOiIwMTlhODI5Yy02YjNlLTc1NzYtOTY3ZC0zMDIwMmZlMGU1MmQifSwiaXNzIjoiVGVuYW50IFNlcnZpY2UiLCJleHAiOjE3NjM3MzI3MTR9.kdsez_ECfgu_gNjFDM2XeM0GuNA1_G9qPn3nc4q54JQ" \
-  -d '{
-        "original_url": "www.baidu.com",
-        "expiration": 3600
-      }'
+https POST "https://localhost:8080/shortlinks" \
+Authorization:"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJNIjp7InRlbmFudF9pZCI6IjAxOWE5MWEyLTU3ZTktNzM1Zi1hYTI3LWVjMDI4ZWM1N2JiNSIsInVzZXJfaWQiOiIwMTlhOTFhMi1hOTAwLTc2Y2UtODZiNy05ZDkxOTMyMjU5NWQifSwiaXNzIjoiVGVuYW50IFNlcnZpY2UiLCJleHAiOjE3NjQwNjIyOTV9.GBWW7Uqe-2zqEOuW-KoFaVpZRp7_hu5TrwNwa9h6Miw" \
+original_url="www.baidu.com" expiration:=3600 \
+--json --verify no
 
 # 短链解析和跳转
-curl -X GET "http://localhost:8080/resolve/6tSb4nAJRB4"
+https GET "https://localhost:8080/resolve/6tSb4nAJRB4"  --verify no
 
 # 查看今日排行榜
-curl -X GET "localhost:8080/ranking/today?num=100" \
-    -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJNIjp7InRlbmFudF9pZCI6IjAxOWE4MjliLTIyMzEtNzc0MC1iYTQ3LTI0M2FjYTllYWRlYiIsInVzZXJfaWQiOiIwMTlhODI5Yy02YjNlLTc1NzYtOTY3ZC0zMDIwMmZlMGU1MmQifSwiaXNzIjoiVGVuYW50IFNlcnZpY2UiLCJleHAiOjE3NjM3MzI3MTR9.kdsez_ECfgu_gNjFDM2XeM0GuNA1_G9qPn3nc4q54JQ"
+https GET "localhost:8080/ranking/today?num=100" \
+Authorization:"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJNIjp7InRlbmFudF9pZCI6IjAxOWE5MWEyLTU3ZTktNzM1Zi1hYTI3LWVjMDI4ZWM1N2JiNSIsInVzZXJfaWQiOiIwMTlhOTFhMi1hOTAwLTc2Y2UtODZiNy05ZDkxOTMyMjU5NWQifSwiaXNzIjoiVGVuYW50IFNlcnZpY2UiLCJleHAiOjE3NjQwNjIyOTV9.GBWW7Uqe-2zqEOuW-KoFaVpZRp7_hu5TrwNwa9h6Miw" \
+--json --verify no
 ```
 
 ```bash

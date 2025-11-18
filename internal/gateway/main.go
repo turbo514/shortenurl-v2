@@ -27,7 +27,7 @@ func main() {
 	logger := mylog.GetLogger()
 
 	ctx := context.Background()
-	gin.SetMode(gin.ReleaseMode)
+	gin.SetMode(gin.DebugMode)
 	// --- 读取配置 ---
 	// 默认为本地开发路径
 	v, err := commonconfig.NewViper(commonconfig.GlobalFile, commonconfig.GlobalPath, commonconfig.ServiceFile, commonconfig.ServicePath)
@@ -105,9 +105,13 @@ func main() {
 
 	// 1. 启动HTTP服务器,监听用户请求
 	g.Add(func() error {
-		gin.SetMode(gin.ReleaseMode)
 		logger.Info("正在启动HTTP服务器", "port", cfg.Server.Port)
-		if err := r.Run(fmt.Sprintf(":%d", cfg.Server.Port)); err != nil {
+
+		if err := r.RunTLS(
+			fmt.Sprintf(":%d", cfg.Server.Port),
+			cfg.Server.ServerCrtFilePath,
+			cfg.Server.ServerKeyFilePath,
+		); err != nil {
 			return fmt.Errorf("启动HTTP服务器失败", "err", err.Error())
 		}
 		return nil

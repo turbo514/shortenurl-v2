@@ -1,5 +1,7 @@
 api-gateway:
   port: 8080
+  server-crt-file-path: ./config/certs/server.crt
+  server-key-file-path: ./config/certs/server.key
 service-info:
   name: api-gateway
   version: 1.0.0

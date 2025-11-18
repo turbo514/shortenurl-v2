@@ -73,7 +73,9 @@ type GinConfig struct {
 }
 type TraceConfig struct{}
 type ApiGatewayConfig struct {
-	Port int `mapstructure:"port"`
+	Port              int    `mapstructure:"port"`
+	ServerCrtFilePath string `mapstructure:"server-crt-file-path"`
+	ServerKeyFilePath string `mapstructure:"server-key-file-path"`
 }
 
 type TenantServiceConfig struct {
